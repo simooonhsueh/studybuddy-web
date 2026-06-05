@@ -1,0 +1,7 @@
+{
+  "target": "研究所推甄",
+  "examDate": "2026-10-01",
+  "dailyStudyHours": 3,
+  "preferredSubjects": ["作業系統", "資料結構", "正規語言"],
+  "schedulePreference": "night"
+}
