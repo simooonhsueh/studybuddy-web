@@ -132,6 +132,12 @@ h3 {
   margin: 0;
 }
 
+.hero-title,
+.screen-title {
+  color: #f8fafc;
+  text-shadow: 0 0 24px rgba(96, 165, 250, 0.25);
+}
+
 .hero-subtitle {
   margin: 12px 0 0;
   color: #bfdbfe;

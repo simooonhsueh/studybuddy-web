@@ -23,7 +23,7 @@ function ProfileSetupPage({ profile, setProfile, onSubmit }) {
   return (
     <section className="screen">
       <p className="section-label">Profile Setup</p>
-      <h2>建立你的學習檔案</h2>
+      <h2 className="screen-title">建立你的學習檔案</h2>
       <p className="screen-description">
         請輸入基本學習資訊，系統會用這些資料生成後續的 Demo 情境。
       </p>
