@@ -1,7 +1,15 @@
-{
-  "target": "研究所推甄",
-  "examDate": "2026-10-01",
-  "dailyStudyHours": 3,
-  "preferredSubjects": ["作業系統", "資料結構", "正規語言"],
-  "schedulePreference": "night"
-}
+[
+  {
+    "id": 1780769986179,
+    "name": "1",
+    "examGoal": "1",
+    "examDate": "0001-11-11",
+    "dailyStudyHours": "1109.5",
+    "preferredSubjects": "111",
+    "weakSubjects": "11",
+    "availableTime": "11",
+    "wakeTime": "11:11",
+    "sleepTime": "11:11",
+    "createdAt": "2026-06-06T18:19:46.179Z"
+  }
+]
