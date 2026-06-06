@@ -3,6 +3,7 @@ function TaskCard({ title, description, time, completed, onToggle }) {
     <button
       className={completed ? "task-card completed" : "task-card"}
       onClick={onToggle}
+      aria-pressed={completed}
     >
       <div className="task-status">{completed ? "完成" : "待辦"}</div>
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 import WelcomePage from "./pages/WelcomePage";
@@ -7,6 +7,13 @@ import MainHubPage from "./pages/MainHubPage";
 import SchedulePage from "./pages/SchedulePage";
 import MatchPage from "./pages/MatchPage";
 import ProgressPage from "./pages/ProgressPage";
+import {
+  clearProgressState,
+  defaultProgressState,
+  getLocalDateKey,
+  loadProgressState,
+  saveProgressState,
+} from "./services/progressStorage";
 
 function App() {
   const [page, setPage] = useState("welcome");
@@ -19,9 +26,13 @@ function App() {
     focusSubject: "",
   });
 
-  const [checkedTasks, setCheckedTasks] = useState([]);
-  const [streak, setStreak] = useState(5);
-  const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const [progressState, setProgressState] = useState(loadProgressState);
+  const today = getLocalDateKey();
+  const hasCheckedIn = progressState.lastCheckInDate === today;
+
+  useEffect(() => {
+    saveProgressState(progressState);
+  }, [progressState]);
 
   function goToPage(nextPage) {
     setPage(nextPage);
@@ -30,15 +41,17 @@ function App() {
   function toggleTask(index) {
     if (hasCheckedIn) return;
 
-    if (checkedTasks.includes(index)) {
-      setCheckedTasks(checkedTasks.filter((item) => item !== index));
-    } else {
-      setCheckedTasks([...checkedTasks, index]);
-    }
+    setProgressState((current) => ({
+      ...current,
+      taskDate: today,
+      checkedTasks: current.checkedTasks.includes(index)
+        ? current.checkedTasks.filter((item) => item !== index)
+        : [...current.checkedTasks, index],
+    }));
   }
 
   function completeCheckIn(totalTasks) {
-    if (checkedTasks.length < totalTasks) {
+    if (progressState.checkedTasks.length < totalTasks) {
       alert("請先完成所有任務再打卡。");
       return;
     }
@@ -48,8 +61,12 @@ function App() {
       return;
     }
 
-    setStreak(streak + 1);
-    setHasCheckedIn(true);
+    setProgressState((current) => ({
+      ...current,
+      streak: current.streak + 1,
+      lastCheckInDate: today,
+      checkInDates: [...new Set([...current.checkInDates, today])],
+    }));
     alert("打卡成功，連續打卡天數已更新。");
   }
 
@@ -62,9 +79,8 @@ function App() {
       studyTime: "",
       focusSubject: "",
     });
-    setCheckedTasks([]);
-    setStreak(5);
-    setHasCheckedIn(false);
+    setProgressState(defaultProgressState);
+    clearProgressState();
   }
 
   return (
@@ -104,7 +120,7 @@ function App() {
             <SchedulePage
               profile={profile}
               goToPage={goToPage}
-              checkedTasks={checkedTasks}
+              checkedTasks={progressState.checkedTasks}
               toggleTask={toggleTask}
             />
           )}
@@ -117,9 +133,10 @@ function App() {
             <ProgressPage
               profile={profile}
               goToPage={goToPage}
-              checkedTasks={checkedTasks}
-              streak={streak}
+              checkedTasks={progressState.checkedTasks}
+              streak={progressState.streak}
               hasCheckedIn={hasCheckedIn}
+              checkInDates={progressState.checkInDates}
               completeCheckIn={completeCheckIn}
             />
           )}
