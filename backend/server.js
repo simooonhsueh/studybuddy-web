@@ -7,6 +7,9 @@ const userRoutes = require('./routes/userRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const matchRoutes = require('./routes/matchRoutes');
 
+// 💡 關鍵引入：直接把你的 taskController 抓進來用
+const taskController = require('./controllers/taskController');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -25,10 +28,10 @@ app.use('/api/user', userRoutes);
 app.use('/api/progress', progressRoutes);
 // 企劃書裡的 checkin 寫在根目錄，我們把它掛進 progress 裡比較好管理，前端呼叫 /api/progress/checkin
 app.use('/api/match', matchRoutes);
-// AI 排程的部分，我們可以直接沿用 taskRoutes 來回傳資料
-app.post('/api/generate-plan', (req, res) => {
-    res.status(200).json({ status: 'success', message: 'AI 計畫已產生，請呼叫 GET /api/tasks 取得任務' });
-});
+
+// 🔥 【超級大修正】不要在這裡寫死 res.json！
+// 讓前端 POST /api/generate-plan 時，真正走進你的 taskController 裡去跑 OpenAI 大腦！
+app.post('/api/generate-plan', taskController.generatePlan);
 
 // 啟動伺服器 [cite: 46]
 app.listen(PORT, () => {
