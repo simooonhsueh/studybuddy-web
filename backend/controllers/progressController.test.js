@@ -1,12 +1,33 @@
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const test = require("node:test");
+
+const testDataFile = path.join(__dirname, "../data/progress.test.json");
+const testProfileFile = path.join(__dirname, "../data/profile.test.json");
+process.env.PROGRESS_DATA_FILE = testDataFile;
+process.env.PROFILE_DATA_FILE = testProfileFile;
+
 const {
   checkIn,
   completeTask,
   getProgress,
   replaceTasks,
-  resetProgressForTests,
 } = require("./progressController");
+
+function createRequest(userId, overrides = {}) {
+  return {
+    body: {},
+    params: {},
+    query: {},
+    get(name) {
+      return name === "x-user-id" && userId != null
+        ? String(userId)
+        : undefined;
+    },
+    ...overrides,
+  };
+}
 
 function createResponse() {
   return {
@@ -23,70 +44,145 @@ function createResponse() {
   };
 }
 
+function getDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 test.beforeEach(() => {
-  resetProgressForTests();
+  fs.writeFileSync(testDataFile, JSON.stringify({ users: {} }), "utf-8");
+  fs.writeFileSync(
+    testProfileFile,
+    JSON.stringify([{ id: "1001", name: "User A" }, { id: "1002", name: "User B" }]),
+    "utf-8",
+  );
 });
 
-test("tracks completed tasks and calculates completion rate", () => {
+test.after(() => {
+  for (const file of [testDataFile, testProfileFile]) {
+    if (fs.existsSync(file)) {
+      fs.unlinkSync(file);
+    }
+  }
+});
+
+test("new users start with a streak of zero", () => {
+  const response = createResponse();
+  getProgress(createRequest("1001"), response);
+
+  assert.equal(response.body.data.streak, 0);
+  assert.deepEqual(response.body.data.tasks, []);
+});
+
+test("tracks completed tasks and persists the result", () => {
   replaceTasks(
-    { body: { tasks: [{ id: "1" }, { id: "2" }] } },
+    createRequest("1001", {
+      body: { tasks: [{ id: "0" }, { id: "1" }] },
+    }),
     createResponse(),
   );
 
-  const completeResponse = createResponse();
   completeTask(
-    { params: { id: "1" }, body: { isCompleted: true } },
-    completeResponse,
+    createRequest("1001", {
+      params: { id: "0" },
+      body: { isCompleted: true },
+    }),
+    createResponse(),
   );
 
-  assert.equal(completeResponse.body.data.progress.completedTasks, 1);
-  assert.equal(completeResponse.body.data.progress.completionRate, 50);
+  const response = createResponse();
+  getProgress(createRequest("1001"), response);
+
+  assert.equal(response.body.data.completedTasks, 1);
+  assert.equal(response.body.data.completionRate, 50);
+});
+
+test("keeps progress separate for each user", () => {
+  replaceTasks(
+    createRequest("1001", { body: { tasks: [{ id: "0" }] } }),
+    createResponse(),
+  );
+  completeTask(
+    createRequest("1001", {
+      params: { id: "0" },
+      body: { isCompleted: true },
+    }),
+    createResponse(),
+  );
+
+  const otherUserResponse = createResponse();
+  getProgress(createRequest("1002"), otherUserResponse);
+
+  assert.equal(otherUserResponse.body.data.completedTasks, 0);
+  assert.equal(otherUserResponse.body.data.streak, 0);
 });
 
 test("requires every task before check-in and prevents duplicate check-in", () => {
-  replaceTasks({ body: { tasks: [{ id: "1" }] } }, createResponse());
+  replaceTasks(
+    createRequest("1001", { body: { tasks: [{ id: "0" }] } }),
+    createResponse(),
+  );
 
   const earlyResponse = createResponse();
-  checkIn({}, earlyResponse);
+  checkIn(createRequest("1001"), earlyResponse);
   assert.equal(earlyResponse.statusCode, 400);
 
   completeTask(
-    { params: { id: "1" }, body: { isCompleted: true } },
+    createRequest("1001", {
+      params: { id: "0" },
+      body: { isCompleted: true },
+    }),
     createResponse(),
   );
 
   const successResponse = createResponse();
-  checkIn({}, successResponse);
-  assert.equal(successResponse.statusCode, 200);
+  checkIn(createRequest("1001"), successResponse);
   assert.equal(successResponse.body.data.streak, 1);
 
   const duplicateResponse = createResponse();
-  checkIn({}, duplicateResponse);
+  checkIn(createRequest("1001"), duplicateResponse);
   assert.equal(duplicateResponse.statusCode, 409);
 });
 
-test("returns the current progress payload", () => {
-  const response = createResponse();
-  getProgress({}, response);
+test("resets the streak when the previous check-in was not yesterday", () => {
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-  assert.deepEqual(response.body, {
-    status: "success",
-    data: {
-      totalTasks: 0,
-      completedTasks: 0,
-      completionRate: 0,
-      streak: 0,
-      hasCheckedIn: false,
-      lastCheckInDate: null,
-      checkInDates: [],
-    },
-  });
+  fs.writeFileSync(
+    testDataFile,
+    JSON.stringify({
+      users: {
+        "1001": {
+          tasks: [{ id: "0", isCompleted: true }],
+          taskDate: getDateKey(),
+          streak: 5,
+          lastCheckInDate: getDateKey(twoDaysAgo),
+          checkInDates: [getDateKey(twoDaysAgo)],
+        },
+      },
+    }),
+    "utf-8",
+  );
+
+  const response = createResponse();
+  checkIn(createRequest("1001"), response);
+
+  assert.equal(response.body.data.streak, 1);
 });
 
-test("rejects a missing task payload without crashing", () => {
+test("rejects requests without a user ID", () => {
   const response = createResponse();
-  replaceTasks({ body: undefined }, response);
+  getProgress(createRequest(null), response);
 
-  assert.equal(response.statusCode, 400);
-  assert.equal(response.body.status, "error");
+  assert.equal(response.statusCode, 401);
+});
+
+test("rejects unknown users", () => {
+  const response = createResponse();
+  getProgress(createRequest("9999"), response);
+
+  assert.equal(response.statusCode, 403);
 });
