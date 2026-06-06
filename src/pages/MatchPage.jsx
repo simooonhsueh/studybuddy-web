@@ -9,7 +9,7 @@ function MatchPage({ profile, goToPage }) {
       </button>
 
       <p className="section-label">Buddy Matching</p>
-      <h2>Study Buddy 配對</h2>
+      <h2 className="screen-title">Study Buddy 配對</h2>
 
       <div className="summary-card">
         <span>配對條件</span>

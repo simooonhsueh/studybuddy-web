@@ -1,4 +1,4 @@
-function WelcomePage({ onStart }) {
+function WelcomePage({ onStart, onLogin }) {
   return (
     <section className="screen welcome-screen">
       <div className="hero-panel">
@@ -11,9 +11,15 @@ function WelcomePage({ onStart }) {
           提供學習排程、學伴配對與進度追蹤功能。
         </p>
 
-        <button className="primary-button" onClick={onStart}>
-          開始建立學習檔案
-        </button>
+        <div className="welcome-actions">
+          <button className="primary-button" onClick={onStart}>
+            開始建立學習檔案
+          </button>
+
+          <button className="secondary-button" onClick={onLogin}>
+            我已經建立，使用名稱登入
+          </button>
+        </div>
       </div>
 
       <div className="overview-grid">

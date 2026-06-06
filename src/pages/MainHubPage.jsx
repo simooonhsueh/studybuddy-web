@@ -7,7 +7,7 @@ function MainHubPage({ profile, goToPage }) {
   return (
     <section className="screen">
       <p className="section-label">Learning Hub</p>
-      <h2>歡迎，{profile.name}</h2>
+      <h2 className="screen-title" >歡迎，{profile.name}</h2>
 
       <div className="summary-card">
         <span>近期測驗目標</span>
