@@ -7,6 +7,7 @@ import MainHubPage from "./pages/MainHubPage";
 import SchedulePage from "./pages/SchedulePage";
 import MatchPage from "./pages/MatchPage";
 import ProgressPage from "./pages/ProgressPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   const [page, setPage] = useState("welcome");
@@ -84,16 +85,27 @@ function App() {
             <span className="brand-subtitle">Learning Management</span>
           </button>
 
-          {page !== "welcome" && (
+          {page !== "welcome" && page !== "login" && page !== "profile" && (
             <button className="header-action" onClick={resetDemo}>
-              Reset
+              Log out
             </button>
           )}
         </header>
 
         <main className="app-main">
           {page === "welcome" && (
-            <WelcomePage onStart={() => goToPage("profile")} />
+            <WelcomePage
+              onStart={() => goToPage("profile")}
+              onLogin={() => goToPage("login")}
+            />
+          )}
+          
+          {page === "login" && (
+            <LoginPage
+              setProfile={setProfile}
+              onLoginSuccess={() => goToPage("hub")}
+              goToPage={goToPage}
+            />
           )}
 
           {page === "profile" && (
@@ -101,6 +113,7 @@ function App() {
               profile={profile}
               setProfile={setProfile}
               onSubmit={() => goToPage("hub")}
+              goToPage={goToPage}
             />
           )}
 

@@ -12,13 +12,13 @@ function SchedulePage({ profile, goToPage, checkedTasks, toggleTask }) {
       </button>
 
       <p className="section-label">AI Learning Plan</p>
-      <h2>AI 學習排程</h2>
+      <h2 className="screen-title">AI 學習排程</h2>
 
       <div className="summary-card">
         <span>排程依據</span>
         <h3>{profile.examGoal}</h3>
-        <p>目前課表：{profile.schedule || "未提供課表資訊"}</p>
-        <p>加強科目：{profile.focusSubject || "未提供加強科目"}</p>
+        <p>可讀書時段：{profile.availableTime || "未提供可讀書時段"}</p>
+        <p>加強科目：{profile.preferredSubjects || "未提供加強科目"}</p>
       </div>
 
       <ProgressBar

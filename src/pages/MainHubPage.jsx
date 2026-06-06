@@ -7,13 +7,13 @@ function MainHubPage({ profile, goToPage }) {
   return (
     <section className="screen">
       <p className="section-label">Learning Hub</p>
-      <h2>歡迎，{profile.name}</h2>
+      <h2 className="screen-title" >歡迎，{profile.name}</h2>
 
       <div className="summary-card">
         <span>近期測驗目標</span>
         <h3>{profile.examGoal}</h3>
-        <p>可讀書時段：{profile.studyTime || "尚未填寫"}</p>
-        <p>想加強科目：{profile.focusSubject || "尚未填寫"}</p>
+        <p>可讀書時段：{profile.availableTime || "尚未填寫"}</p>
+        <p>想加強科目：{profile.weakSubjects || "尚未填寫"}</p>
       </div>
 
       <div className="feature-list">

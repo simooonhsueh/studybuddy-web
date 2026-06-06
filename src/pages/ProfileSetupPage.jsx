@@ -1,6 +1,7 @@
 import { saveUserProfile } from "../services/userApi";
+import { useRef } from "react";
 
-function ProfileSetupPage({ profile, setProfile, onSubmit }) {
+function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
   function updateField(key, value) {
     setProfile({
       ...profile,
@@ -35,24 +36,32 @@ function ProfileSetupPage({ profile, setProfile, onSubmit }) {
     }
 
     try {
-      localStorage.setItem("studybuddy-profile", JSON.stringify(profile));
+      const result = await saveUserProfile(profile);
 
-      await saveUserProfile(profile);
+      localStorage.setItem(
+        "studybuddy-profile",
+        JSON.stringify(result.data)
+      );
+
+      setProfile(result.data);
 
       onSubmit();
     } catch (error) {
       console.error("儲存使用者資料失敗：", error);
 
-      alert("後端儲存失敗，但已先儲存在瀏覽器。");
+      alert(error.message || "儲存失敗，請稍後再試。");
 
-      onSubmit();
+      return;
     }
   }
 
   return (
     <section className="screen">
+      <button className="back-button" onClick={() => goToPage("welcome")}>
+        ← 回首頁
+      </button>
       <p className="section-label">Profile Setup</p>
-      <h2>建立你的學習檔案</h2>
+      <h2 className="screen-title">建立你的學習檔案</h2>
       <p className="screen-description">
         請輸入備考目標、考試日期與每天可讀時間，系統會用這些資料產生學習計畫與推薦學伴。
       </p>
@@ -78,8 +87,7 @@ function ProfileSetupPage({ profile, setProfile, onSubmit }) {
 
         <label>
           考試日期
-          <input
-            type="date"
+          <DateInput
             value={profile.examDate}
             onChange={(event) => updateField("examDate", event.target.value)}
           />
@@ -132,8 +140,7 @@ function ProfileSetupPage({ profile, setProfile, onSubmit }) {
 
         <label>
           起床時間
-          <input
-            type="time"
+          <TimeInput
             value={profile.wakeTime}
             onChange={(event) => updateField("wakeTime", event.target.value)}
           />
@@ -141,8 +148,7 @@ function ProfileSetupPage({ profile, setProfile, onSubmit }) {
 
         <label>
           睡覺時間
-          <input
-            type="time"
+          <TimeInput
             value={profile.sleepTime}
             onChange={(event) => updateField("sleepTime", event.target.value)}
           />
@@ -155,5 +161,68 @@ function ProfileSetupPage({ profile, setProfile, onSubmit }) {
     </section>
   );
 }
+function TimeInput({ value, onChange }) {
+  const inputRef = useRef(null);
 
+  function openTimePicker() {
+    if (inputRef.current?.showPicker) {
+      inputRef.current.showPicker();
+    } else {
+      inputRef.current?.focus();
+    }
+  }
+
+  return (
+    <div className="time-input-wrapper">
+      <input
+        ref={inputRef}
+        type="time"
+        value={value}
+        onChange={onChange}
+        className="time-input"
+      />
+
+      <button
+        type="button"
+        className="time-picker-button"
+        onClick={openTimePicker}
+        aria-label="Show time picker"
+      >
+        🕒
+      </button>
+    </div>
+  );
+}
+function DateInput({ value, onChange }) {
+  const inputRef = useRef(null);
+
+  function openDatePicker() {
+    if (inputRef.current?.showPicker) {
+      inputRef.current.showPicker();
+    } else {
+      inputRef.current?.focus();
+    }
+  }
+
+  return (
+    <div className="date-input-wrapper">
+      <input
+        ref={inputRef}
+        type="date"
+        value={value}
+        onChange={onChange}
+        className="date-input"
+      />
+
+      <button
+        type="button"
+        className="date-picker-button"
+        onClick={openDatePicker}
+        aria-label="Show date picker"
+      >
+        📅
+      </button>
+    </div>
+  );
+}
 export default ProfileSetupPage;
