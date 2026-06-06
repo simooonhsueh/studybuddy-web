@@ -45,7 +45,7 @@ function ProgressPage({
       </button>
 
       <p className="section-label">Progress Tracking</p>
-      <h2>Streak 進度追蹤</h2>
+      <h2 className="screen-title">Streak 進度追蹤</h2>
 
       <div className="summary-card">
         <span>學習狀態</span>

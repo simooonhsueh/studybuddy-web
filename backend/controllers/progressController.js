@@ -18,7 +18,7 @@ function getDateKey(date = new Date()) {
 function getProgressPayload() {
   const totalTasks = progressState.tasks.length;
   const completedTasks = progressState.tasks.filter(
-    (task) => task.completed,
+    (task) => task.isCompleted,
   ).length;
 
   return {
@@ -33,44 +33,60 @@ function getProgressPayload() {
   };
 }
 
-export function getProgress(_req, res) {
-  return res.json(getProgressPayload());
+function getProgress(_req, res) {
+  return res.status(200).json({
+    status: "success",
+    data: getProgressPayload(),
+  });
 }
 
-export function replaceTasks(req, res) {
-  const { tasks } = req.body;
+function replaceTasks(req, res) {
+  const tasks = req.body?.tasks;
 
   if (!Array.isArray(tasks)) {
-    return res.status(400).json({ message: "tasks 必須是陣列。" });
+    return res.status(400).json({
+      status: "error",
+      message: "tasks 必須是陣列。",
+    });
   }
 
   progressState.tasks = tasks.map((task) => ({
     id: String(task.id),
-    completed: Boolean(task.completed),
+    isCompleted: Boolean(task.isCompleted ?? task.completed),
   }));
 
-  return res.json(getProgressPayload());
+  return res.status(200).json({
+    status: "success",
+    data: getProgressPayload(),
+  });
 }
 
-export function completeTask(req, res) {
+function completeTask(req, res) {
   const task = progressState.tasks.find(
     (item) => item.id === String(req.params.id),
   );
 
   if (!task) {
-    return res.status(404).json({ message: "找不到指定任務。" });
+    return res.status(404).json({
+      status: "error",
+      message: "找不到指定任務。",
+    });
   }
 
-  task.completed =
-    typeof req.body.completed === "boolean" ? req.body.completed : true;
+  const requestedValue = req.body?.isCompleted ?? req.body?.completed;
+  task.isCompleted =
+    typeof requestedValue === "boolean" ? requestedValue : true;
 
-  return res.json({
-    task,
-    progress: getProgressPayload(),
+  return res.status(200).json({
+    status: "success",
+    data: {
+      task,
+      progress: getProgressPayload(),
+    },
   });
 }
 
-export function checkIn(_req, res) {
+function checkIn(_req, res) {
   const progress = getProgressPayload();
   const today = getDateKey();
 
@@ -79,15 +95,17 @@ export function checkIn(_req, res) {
     progress.completedTasks < progress.totalTasks
   ) {
     return res.status(400).json({
+      status: "error",
       message: "請先完成所有今日任務再打卡。",
-      progress,
+      data: progress,
     });
   }
 
   if (progressState.lastCheckInDate === today) {
     return res.status(409).json({
+      status: "error",
       message: "今日已完成打卡。",
-      progress,
+      data: progress,
     });
   }
 
@@ -97,12 +115,21 @@ export function checkIn(_req, res) {
     ...new Set([...progressState.checkInDates, today]),
   ];
 
-  return res.json({
+  return res.status(200).json({
+    status: "success",
     message: "打卡成功。",
-    progress: getProgressPayload(),
+    data: getProgressPayload(),
   });
 }
 
-export function resetProgressForTests() {
+function resetProgressForTests() {
   progressState = structuredClone(initialState);
 }
+
+module.exports = {
+  getProgress,
+  replaceTasks,
+  completeTask,
+  checkIn,
+  resetProgressForTests,
+};
