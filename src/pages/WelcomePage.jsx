@@ -3,7 +3,7 @@ function WelcomePage({ onStart }) {
     <section className="screen welcome-screen">
       <div className="hero-panel">
 
-        <h1>StudyBuddy AI</h1>
+        <h1 className="hero-title">StudyBuddy AI</h1>
         <p className="hero-subtitle">Learn Smarter, Together.</p>
 
         <p className="hero-description">
