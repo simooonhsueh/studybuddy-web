@@ -15,7 +15,7 @@ function MatchPage({ profile, goToPage }) {
         <span>配對條件</span>
         <h3>{profile.focusSubject || "尚未設定加強科目"}</h3>
         <p>近期目標：{profile.examGoal}</p>
-        <p>可讀書時段：{profile.studyTime || "尚未填寫"}</p>
+        <p>可讀書時段：{profile.availableTime || "尚未填寫"}</p>
       </div>
 
       <div className="section-block">
