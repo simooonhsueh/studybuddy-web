@@ -13,10 +13,14 @@ function App() {
 
   const [profile, setProfile] = useState({
     name: "",
-    schedule: "",
     examGoal: "",
-    studyTime: "",
-    focusSubject: "",
+    examDate: "",
+    dailyStudyHours: "",
+    preferredSubjects: "",
+    weakSubjects: "",
+    availableTime: "",
+    wakeTime: "",
+    sleepTime: "",
   });
 
   const [checkedTasks, setCheckedTasks] = useState([]);
@@ -57,10 +61,14 @@ function App() {
     setPage("welcome");
     setProfile({
       name: "",
-      schedule: "",
       examGoal: "",
-      studyTime: "",
-      focusSubject: "",
+      examDate: "",
+      dailyStudyHours: "",
+      preferredSubjects: "",
+      weakSubjects: "",
+      availableTime: "",
+      wakeTime: "",
+      sleepTime: "",
     });
     setCheckedTasks([]);
     setStreak(5);
