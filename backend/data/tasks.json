@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "複習 Context-Free Grammar 與 Pumping Lemma",
+      "subject": "正規語言",
+      "estimatedMinutes": 60,
+      "isCompleted": false,
+      "date": "2026-06-05"
+    },
+    {
+      "id": "task-002",
+      "title": "實作 Kubernetes 自動擴展機制",
+      "subject": "專案開發",
+      "estimatedMinutes": 120,
+      "isCompleted": true,
+      "date": "2026-06-05"
+    },
+    {
+      "id": "task-003",
+      "title": "整理期末報告 Demo 流程",
+      "subject": "軟體工程",
+      "estimatedMinutes": 30,
+      "isCompleted": false,
+      "date": "2026-06-05"
+    }
+  ]
+}

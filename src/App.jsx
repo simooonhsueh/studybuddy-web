@@ -7,6 +7,7 @@ import MainHubPage from "./pages/MainHubPage";
 import SchedulePage from "./pages/SchedulePage";
 import MatchPage from "./pages/MatchPage";
 import ProgressPage from "./pages/ProgressPage";
+import LoginPage from "./pages/LoginPage";
 import {
   clearProgressState,
   defaultProgressState,
@@ -20,10 +21,14 @@ function App() {
 
   const [profile, setProfile] = useState({
     name: "",
-    schedule: "",
     examGoal: "",
-    studyTime: "",
-    focusSubject: "",
+    examDate: "",
+    dailyStudyHours: "",
+    preferredSubjects: "",
+    weakSubjects: "",
+    availableTime: "",
+    wakeTime: "",
+    sleepTime: "",
   });
 
   const [progressState, setProgressState] = useState(loadProgressState);
@@ -74,10 +79,14 @@ function App() {
     setPage("welcome");
     setProfile({
       name: "",
-      schedule: "",
       examGoal: "",
-      studyTime: "",
-      focusSubject: "",
+      examDate: "",
+      dailyStudyHours: "",
+      preferredSubjects: "",
+      weakSubjects: "",
+      availableTime: "",
+      wakeTime: "",
+      sleepTime: "",
     });
     setProgressState(defaultProgressState);
     clearProgressState();
@@ -92,16 +101,27 @@ function App() {
             <span className="brand-subtitle">Learning Management</span>
           </button>
 
-          {page !== "welcome" && (
+          {page !== "welcome" && page !== "login" && page !== "profile" && (
             <button className="header-action" onClick={resetDemo}>
-              Reset
+              Log out
             </button>
           )}
         </header>
 
         <main className="app-main">
           {page === "welcome" && (
-            <WelcomePage onStart={() => goToPage("profile")} />
+            <WelcomePage
+              onStart={() => goToPage("profile")}
+              onLogin={() => goToPage("login")}
+            />
+          )}
+
+          {page === "login" && (
+            <LoginPage
+              setProfile={setProfile}
+              onLoginSuccess={() => goToPage("hub")}
+              goToPage={goToPage}
+            />
           )}
 
           {page === "profile" && (
@@ -109,6 +129,7 @@ function App() {
               profile={profile}
               setProfile={setProfile}
               onSubmit={() => goToPage("hub")}
+              goToPage={goToPage}
             />
           )}
 

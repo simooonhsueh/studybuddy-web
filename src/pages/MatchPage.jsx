@@ -9,13 +9,13 @@ function MatchPage({ profile, goToPage }) {
       </button>
 
       <p className="section-label">Buddy Matching</p>
-      <h2>Study Buddy 配對</h2>
+      <h2 className="screen-title">Study Buddy 配對</h2>
 
       <div className="summary-card">
         <span>配對條件</span>
         <h3>{profile.focusSubject || "尚未設定加強科目"}</h3>
         <p>近期目標：{profile.examGoal}</p>
-        <p>可讀書時段：{profile.studyTime || "尚未填寫"}</p>
+        <p>可讀書時段：{profile.availableTime || "尚未填寫"}</p>
       </div>
 
       <div className="section-block">

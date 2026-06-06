@@ -1,16 +1,11 @@
-import { Router } from "express";
-import {
-  checkIn,
-  completeTask,
-  getProgress,
-  replaceTasks,
-} from "../controllers/progressController.js";
+const express = require("express");
+const progressController = require("../controllers/progressController");
 
-const router = Router();
+const router = express.Router();
 
-router.get("/progress", getProgress);
-router.put("/progress/tasks", replaceTasks);
-router.patch("/tasks/:id/complete", completeTask);
-router.post("/checkin", checkIn);
+router.get("/", progressController.getProgress);
+router.put("/tasks", progressController.replaceTasks);
+router.patch("/tasks/:id/complete", progressController.completeTask);
+router.post("/checkin", progressController.checkIn);
 
-export default router;
+module.exports = router;
