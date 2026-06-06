@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test controllers/progressController.test.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon --ignore data/*.json server.js"
   },
   "keywords": [],
   "author": "",
