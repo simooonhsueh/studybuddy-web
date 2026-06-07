@@ -4,23 +4,24 @@
       "tasks": [
         {
           "id": "a1b2c3d4",
-          "isCompleted": false
+          "isCompleted": true
         },
         {
           "id": "e5f6g7h8",
-          "isCompleted": false
+          "isCompleted": true
         },
         {
           "id": "i9j0k1l2",
-          "isCompleted": false
+          "isCompleted": true
         }
       ],
       "taskDate": "2026-06-08",
-      "streak": 2,
-      "lastCheckInDate": "2026-06-07",
+      "streak": 3,
+      "lastCheckInDate": "2026-06-08",
       "checkInDates": [
         "2026-06-06",
-        "2026-06-07"
+        "2026-06-07",
+        "2026-06-08"
       ]
     },
     "1781000000002": {

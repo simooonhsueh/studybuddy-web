@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { saveUserProfile } from "../services/userApi";
-import { useRef } from "react";
 
 function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
   const [uploadStatus, setUploadStatus] = useState("");
@@ -32,7 +31,9 @@ function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
       const result = await res.json();
 
       if (result.status === "success") {
-        const courseNames = result.data.map((course) => course.courseName).join("、");
+        const courseNames = result.data
+          .map((course) => course.courseName)
+          .join("、");
 
         setProfile((prev) => ({
           ...prev,
@@ -53,12 +54,12 @@ function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
   }
 
   async function handleSubmit() {
-    if (!profile.name.trim()) {
+    if (!profile.name?.trim()) {
       alert("請輸入使用者名稱。");
       return;
     }
 
-    if (!profile.examGoal.trim()) {
+    if (!profile.examGoal?.trim()) {
       alert("請輸入近期測驗目標。");
       return;
     }
@@ -244,8 +245,6 @@ function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
     </section>
   );
 }
-function TimeInput({ value, onChange }) {
-  const inputRef = useRef(null);
 
 function TimeInput({ value, onChange }) {
   const inputRef = useRef(null);
