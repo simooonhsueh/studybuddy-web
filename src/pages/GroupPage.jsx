@@ -368,7 +368,9 @@ function GroupPage({ profile, goToPage }) {
                 <h3>{user.name}</h3>
                 <p>目標：{user.examGoal || "尚未填寫"}</p>
                 <p>加強科目：{user.weakSubjects || "尚未設定"}</p>
-                <p>可讀書時段：{user.availableTime || "尚未填寫"}</p>
+                <p>可讀書時段：{profile.availableStartTime && profile.availableEndTime
+                ? `${profile.availableStartTime} - ${profile.availableEndTime}`
+                : "尚未填寫"}</p>
                 <p>
                     進度公開範圍：
                     {user.progressVisibility === "public" && "公開給所有人"}

@@ -85,6 +85,74 @@ const loginProfile = (req, res) => {
   }
 };
 
+const updateProfile = (req, res) => {
+  try {
+    const profiles = readProfiles();
+    const { id } = req.params;
+    const updatedProfile = req.body;
+
+    const targetIndex = profiles.findIndex(
+      (profile) => String(profile.id) === String(id)
+    );
+
+    if (targetIndex === -1) {
+      return res.status(404).json({
+        status: "error",
+        message: "找不到此使用者資料",
+      });
+    }
+
+    if (!updatedProfile.name || !updatedProfile.name.trim()) {
+      return res.status(400).json({
+        status: "error",
+        message: "使用者名稱不能為空",
+      });
+    }
+
+    const inputName = updatedProfile.name.trim().toLowerCase();
+
+    const nameExists = profiles.some(
+      (profile) =>
+        String(profile.id) !== String(id) &&
+        profile.name &&
+        profile.name.trim().toLowerCase() === inputName
+    );
+
+    if (nameExists) {
+      return res.status(409).json({
+        status: "error",
+        message: "此使用者名稱已存在，請換一個名稱",
+      });
+    }
+
+    const oldProfile = profiles[targetIndex];
+
+    const profileToUpdate = {
+      ...oldProfile,
+      ...updatedProfile,
+      id: oldProfile.id,
+      name: updatedProfile.name.trim(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    profiles[targetIndex] = profileToUpdate;
+    writeProfiles(profiles);
+
+    res.status(200).json({
+      status: "success",
+      message: "個人資料已更新",
+      data: profileToUpdate,
+    });
+  } catch (error) {
+    console.error("更新 profile 失敗：", error);
+
+    res.status(500).json({
+      status: "error",
+      message: "更新 profile 失敗",
+    });
+  }
+};
+
 // ── PDF 解析：上傳到 OpenAI Files → Responses API 讀取 → 刪除暫存 ───────────
 const { OpenAI, toFile } = require("openai");
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -149,4 +217,4 @@ const parseSchedule = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, saveProfile, loginProfile, parseSchedule };
+module.exports = { getProfile, saveProfile, loginProfile, updateProfile, parseSchedule };
