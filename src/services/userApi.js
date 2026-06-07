@@ -47,3 +47,22 @@ export async function loginUserProfile(name) {
 
   return result;
 }
+
+// 根據目前使用者 id，從後端取得真實配對結果
+export async function fetchMatches(userId) {
+  const response = await fetch(`${API_BASE_URL}/match`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId }),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch matches");
+  }
+
+  return result; // { status: 'success', data: [...] }
+}

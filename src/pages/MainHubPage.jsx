@@ -1,21 +1,33 @@
 import FeatureButton from "../components/FeatureButton";
-import UserCard from "../components/UserCard";
-import CourseCard from "../components/CourseCard";
-import { matchedUsers, courseSuggestions } from "../data/mockData";
 
 function MainHubPage({ profile, goToPage }) {
+  // 把 weakSubjects 轉成顯示用字串（相容陣列與字串兩種格式）
+  const weakDisplay = Array.isArray(profile.weakSubjects)
+    ? profile.weakSubjects.join("、")
+    : profile.weakSubjects || "尚未填寫";
+
+  const preferredDisplay = Array.isArray(profile.preferredSubjects)
+    ? profile.preferredSubjects.join("、")
+    : profile.preferredSubjects || "尚未填寫";
+
+  // 已匯入的課程（上傳課表 PDF 後才有）
+  const courses = profile.courses || [];
+
   return (
     <section className="screen">
       <p className="section-label">Learning Hub</p>
-      <h2 className="screen-title" >歡迎，{profile.name}</h2>
+      <h2 className="screen-title">歡迎，{profile.name}</h2>
 
+      {/* 個人摘要 */}
       <div className="summary-card">
         <span>近期測驗目標</span>
-        <h3>{profile.examGoal}</h3>
+        <h3>{profile.examGoal || "尚未填寫"}</h3>
         <p>可讀書時段：{profile.availableTime || "尚未填寫"}</p>
-        <p>想加強科目：{profile.weakSubjects || "尚未填寫"}</p>
+        <p>想加強科目：{weakDisplay}</p>
+        <p>擅長科目：{preferredDisplay}</p>
       </div>
 
+      {/* 功能入口 */}
       <div className="feature-list">
         <FeatureButton
           title="AI 學習排程"
@@ -39,37 +51,21 @@ function MainHubPage({ profile, goToPage }) {
         />
       </div>
 
-      <div className="section-block">
-        <h3>課表與學習建議</h3>
-        <div className="card-list">
-          {courseSuggestions.map((course) => (
-            <CourseCard
-              key={course.title}
-              title={course.title}
-              subtitle={course.subtitle}
-              time={course.time}
-              note={course.note}
-            />
-          ))}
+      {/* 已匯入課程（上傳課表後才顯示） */}
+      {courses.length > 0 && (
+        <div className="section-block">
+          <h3>已匯入課程</h3>
+          <div className="card-list">
+            {courses.map((course) => (
+              <div key={course.courseCode} className="summary-card" style={{ gap: 4 }}>
+                <span>{course.type}・{course.credits} 學分</span>
+                <h3 style={{ fontSize: 16 }}>{course.courseName}</h3>
+                <p style={{ margin: 0, fontSize: 13 }}>課號：{course.courseCode}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <div className="section-block">
-        <h3>可配對學習者預覽</h3>
-        <div className="card-list">
-          {matchedUsers.slice(0, 2).map((user) => (
-            <UserCard
-              key={user.name}
-              name={user.name}
-              subject={user.subject}
-              goal={user.goal}
-              time={user.time}
-              matchRate={user.matchRate}
-              status={user.status}
-            />
-          ))}
-        </div>
-      </div>
+      )}
     </section>
   );
 }

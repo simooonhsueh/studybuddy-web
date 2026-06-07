@@ -4,6 +4,7 @@ function UserCard({
   goal,
   time,
   matchRate,
+  reasons = [],
   status = "可配對",
   onSelect,
 }) {
@@ -22,7 +23,7 @@ function UserCard({
 
       <div className="user-card-info">
         <div>
-          <span>相同科目</span>
+          <span>加強科目</span>
           <strong>{subject}</strong>
         </div>
 
@@ -32,10 +33,19 @@ function UserCard({
         </div>
 
         <div>
-          <span>重疊時段</span>
+          <span>可讀書時段</span>
           <strong>{time}</strong>
         </div>
       </div>
+
+      {/* 共同點說明清單 */}
+      {reasons.length > 0 && (
+        <ul className="match-reasons">
+          {reasons.map((r, i) => (
+            <li key={i}>{r}</li>
+          ))}
+        </ul>
+      )}
 
       <div className="match-rate-row">
         <span>匹配度</span>
