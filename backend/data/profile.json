@@ -128,5 +128,89 @@
     "wakeTime": "05:17",
     "sleepTime": "17:17",
     "createdAt": "2026-06-06T21:17:23.427Z"
+  },
+  {
+    "id": 1780813631267,
+    "name": "薛伊傑",
+    "examGoal": "兩周後英文段考100分",
+    "examDate": "2026-06-21",
+    "dailyStudyHours": "3",
+    "preferredSubjects": "英文閱讀",
+    "weakSubjects": "英文閱讀",
+    "availableTime": "晚上8:00-11:00",
+    "wakeTime": "08:25",
+    "sleepTime": "12:00",
+    "createdAt": "2026-06-07T06:27:11.267Z"
+  },
+  {
+    "id": 1780813799161,
+    "name": "薛伊傑2",
+    "examGoal": "兩周後段考100分",
+    "examDate": "2026-07-08",
+    "dailyStudyHours": "3",
+    "preferredSubjects": "英文閱讀",
+    "weakSubjects": "數學函數",
+    "availableTime": "晚上8:00-11:00",
+    "wakeTime": "08:35",
+    "sleepTime": "23:35",
+    "createdAt": "2026-06-07T06:29:59.161Z"
+  },
+  {
+    "id": 1780813988124,
+    "name": "simon",
+    "examGoal": "兩周後英文段考",
+    "examDate": "2026-06-21",
+    "dailyStudyHours": "3",
+    "preferredSubjects": "英文閱讀",
+    "weakSubjects": "英文閱讀",
+    "availableTime": "晚上8:00-11:00",
+    "wakeTime": "10:30",
+    "sleepTime": "22:00",
+    "createdAt": "2026-06-07T06:33:08.124Z"
+  },
+  {
+    "id": 1780821762025,
+    "name": "伊傑",
+    "examGoal": "哈囉",
+    "examDate": "2026-06-21",
+    "dailyStudyHours": "3",
+    "preferredSubjects": "資料結構緒論、作業系統、專題討論（二）、元啟發演算法及其應用、創意行動網路APPs之系統技術與設計研發",
+    "weakSubjects": "英文閱讀",
+    "availableTime": "晚上8:00-11:00",
+    "wakeTime": "08:50",
+    "sleepTime": "12:42",
+    "courses": [
+      {
+        "courseName": "資料結構緒論",
+        "credits": 3,
+        "courseCode": "E231600",
+        "type": "選修"
+      },
+      {
+        "courseName": "作業系統",
+        "credits": 3,
+        "courseCode": "E241900",
+        "type": "選修"
+      },
+      {
+        "courseName": "專題討論（二）",
+        "credits": 0,
+        "courseCode": "N250020",
+        "type": "必修"
+      },
+      {
+        "courseName": "元啟發演算法及其應用",
+        "credits": 3,
+        "courseCode": "N25L900",
+        "type": "選修"
+      },
+      {
+        "courseName": "創意行動網路APPs之系統技術與設計研發",
+        "credits": 3,
+        "courseCode": "P75J100",
+        "type": "選修"
+      }
+    ],
+    "createdAt": "2026-06-07T08:42:42.025Z"
   }
 ]

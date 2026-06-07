@@ -1,3 +1,94 @@
 {
-  "users": {}
+  "users": {
+    "1780813631267": {
+      "tasks": [
+        {
+          "id": "1a2b3c4d",
+          "isCompleted": true
+        },
+        {
+          "id": "2b3c4d5e",
+          "isCompleted": true
+        },
+        {
+          "id": "3c4d5e6f",
+          "isCompleted": true
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 1,
+      "lastCheckInDate": "2026-06-07",
+      "checkInDates": [
+        "2026-06-07"
+      ]
+    },
+    "1780813799161": {
+      "tasks": [
+        {
+          "id": "0",
+          "isCompleted": false
+        },
+        {
+          "id": "1",
+          "isCompleted": false
+        },
+        {
+          "id": "2",
+          "isCompleted": false
+        },
+        {
+          "id": "3",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
+    },
+    "1780813988124": {
+      "tasks": [
+        {
+          "id": "0",
+          "isCompleted": false
+        },
+        {
+          "id": "1",
+          "isCompleted": false
+        },
+        {
+          "id": "2",
+          "isCompleted": false
+        },
+        {
+          "id": "3",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
+    },
+    "1780821762025": {
+      "tasks": [
+        {
+          "id": "abc123",
+          "isCompleted": false
+        },
+        {
+          "id": "def456",
+          "isCompleted": false
+        },
+        {
+          "id": "ghi789",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
+    }
+  }
 }
