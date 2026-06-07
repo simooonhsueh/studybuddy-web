@@ -95,6 +95,23 @@ function ProgressPage({
         <p>目前本週已完成 {weeklyCompletedDays} 天學習紀錄。</p>
       </div>
 
+      <div className="summary-card">
+        <span>進度公開範圍</span>
+        <h3>
+          {profile.progressVisibility === "public" && "公開給所有人"}
+          {profile.progressVisibility === "group" && "只公開給群組成員"}
+          {profile.progressVisibility === "private" && "只有自己可見"}
+        </h3>
+        <p>
+          {profile.progressVisibility === "public" &&
+            "其他使用者可以看到你的學習進度。"}
+          {profile.progressVisibility === "group" &&
+            "只有同一個讀書群組的成員可以看到你的學習進度。"}
+          {profile.progressVisibility === "private" &&
+            "只有你自己可以看到學習進度。"}
+        </p>
+      </div>
+
       <button
         className="primary-button"
         onClick={() => completeCheckIn(safeTotalTasks)}

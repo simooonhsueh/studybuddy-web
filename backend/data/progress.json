@@ -89,6 +89,74 @@
       "streak": 0,
       "lastCheckInDate": null,
       "checkInDates": []
+    },
+    "1780832703618": {
+      "tasks": [
+        {
+          "id": "a1b2c3d4",
+          "isCompleted": true
+        },
+        {
+          "id": "e5f6g7h8",
+          "isCompleted": true
+        },
+        {
+          "id": "i9j0k1l2",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
+    },
+    "1780778748379": {
+      "tasks": [
+        {
+          "id": "task1a2b3c",
+          "isCompleted": true
+        },
+        {
+          "id": "task4d5e6f",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
+    },
+    "1780836079454": {
+      "tasks": [
+        {
+          "id": "task1",
+          "isCompleted": true
+        },
+        {
+          "id": "task2",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
+    },
+    "1780837092800": {
+      "tasks": [
+        {
+          "id": "a1b2c3d4",
+          "isCompleted": true
+        },
+        {
+          "id": "e5f6g7h8",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-07",
+      "streak": 0,
+      "lastCheckInDate": null,
+      "checkInDates": []
     }
   }
 }

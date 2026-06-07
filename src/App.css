@@ -746,3 +746,73 @@ textarea:focus {
   line-height: 1.6;
   text-align: left;
 }
+
+.match-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.invite-panel {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.invite-panel select {
+  flex: 1;
+  min-width: 220px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border, #2f3548);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+}
+
+.invite-panel .primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.group-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.group-member-item {
+  padding: 14px;
+  border: 1px solid var(--color-border, #2f3548);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.group-member-item p {
+  margin: 4px 0;
+}
+
+.invite-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.group-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.group-progress-item {
+  padding: 14px;
+  border: 1px solid var(--color-border, #2f3548);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.group-progress-item p {
+  margin: 4px 0;
+}

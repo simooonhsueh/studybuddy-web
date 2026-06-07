@@ -212,5 +212,46 @@
       }
     ],
     "createdAt": "2026-06-07T08:42:42.025Z"
+  },
+  {
+    "id": 1780832703618,
+    "name": "abc",
+    "examGoal": "托福考試",
+    "examDate": "2026-06-13",
+    "dailyStudyHours": "5",
+    "preferredSubjects": "英文閱讀",
+    "weakSubjects": "英文口說",
+    "availableTime": "晚上6:00 - 8:00",
+    "wakeTime": "07:44",
+    "sleepTime": "23:44",
+    "createdAt": "2026-06-07T11:45:03.618Z"
+  },
+  {
+    "id": 1780836079454,
+    "name": "2222",
+    "examGoal": "數學考試",
+    "examDate": "2026-06-13",
+    "dailyStudyHours": "5",
+    "preferredSubjects": "數學函數",
+    "weakSubjects": "排列組合",
+    "availableTime": "晚上8:00 - 10:00",
+    "wakeTime": "08:41",
+    "sleepTime": "23:41",
+    "progressVisibility": "group",
+    "createdAt": "2026-06-07T12:41:19.454Z"
+  },
+  {
+    "id": 1780837092800,
+    "name": "aa12",
+    "examGoal": "數學",
+    "examDate": "2026-06-12",
+    "dailyStudyHours": "5",
+    "preferredSubjects": "函數",
+    "weakSubjects": "排列組合",
+    "availableTime": "晚上8:00 - 11:00",
+    "wakeTime": "08:58",
+    "sleepTime": "23:58",
+    "progressVisibility": "group",
+    "createdAt": "2026-06-07T12:58:12.800Z"
   }
 ]
