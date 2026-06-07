@@ -8,7 +8,14 @@ function ProgressBar({ label = "完成率", value = 0, helperText }) {
         <strong>{safeValue}%</strong>
       </div>
 
-      <div className="progress-track">
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={safeValue}
+      >
         <div className="progress-fill" style={{ width: `${safeValue}%` }} />
       </div>
 

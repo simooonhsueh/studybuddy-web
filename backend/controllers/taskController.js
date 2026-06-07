@@ -5,14 +5,12 @@ const path = require('path');
 
 let currentWeeklyPlan = null;
 
-// 🎯 POST /api/generate-plan
 const generatePlan = async (req, res) => {
     const profilePath = path.join(__dirname, '../data/profile.json');
     
     let targetGoal = "自主提升計畫"; 
     let targetSubject = "核心範圍複習"; 
 
-    // 🎯 1. 看看前端有沒有把目前登入者的名稱傳過來 (相容各種可能的欄位名)
     const reqBody = req.body || {};
     const currentLoginName = reqBody.name || reqBody.username || "";
     
@@ -26,15 +24,11 @@ const generatePlan = async (req, res) => {
             let matchedProfile = null;
 
             if (Array.isArray(parsed)) {
-                // 🎯 2. 如果目前有特定登入帳號，就去陣列裡精準篩選出 name 吻合的最新一筆資料！
                 if (currentLoginName) {
-                    // 從後往前找，確保拿到該帳號最新更新的紀錄
                     matchedProfile = parsed.reverse().find(p => p.name === currentLoginName);
                 }
-                
-                // 🛡️ 保險：如果找不到該帳號，或前端沒傳名稱，就抓陣列最後一筆當預設
                 if (!matchedProfile && parsed.length > 0) {
-                    matchedProfile = parsed[0]; // 因為前面 reverse 了，Index 0 就是原本的最後一筆
+                    matchedProfile = parsed[0];
                 }
             } else {
                 matchedProfile = parsed;
@@ -42,7 +36,6 @@ const generatePlan = async (req, res) => {
             
             const p = matchedProfile?.profile || matchedProfile?.data || matchedProfile?.user || matchedProfile || {};
             
-            // 精準咬住匹配成功的欄位名稱
             if (p.examGoal) targetGoal = p.examGoal.trim();
             if (p.weakSubjects) targetSubject = p.weakSubjects.trim();
             else if (p.preferredSubjects) targetSubject = p.preferredSubjects.trim();
@@ -71,25 +64,48 @@ const generatePlan = async (req, res) => {
         }
 
         res.status(200).json({ status: 'success', message: 'AI 計畫已產生' });
+
     } catch (error) {
-        console.error("💥 AI 生成失敗，觸發 100% 同科目動態防墜：", error.message);
+        console.error("💥 AI 生成失敗，嘗試讀取 tasks.json 作為備援：", error.message);
         
-        const fallbackPlan = [];
-        for (let i = 1; i <= 7; i++) {
-            fallbackPlan.push({
-                day: `Day ${i}`,
-                tasks: [
-                    { id: `fb-d${i}-1`, title: `精進研讀與重點核心突破：${targetSubject}`, isCompleted: false },
-                    { id: `fb-d${i}-2`, title: `針對【${targetGoal}】進行歷屆試題實戰演練`, isCompleted: false }
-                ]
-            });
+        try {
+            const filePath = path.join(__dirname, '../data/tasks.json');
+            const fileData = fs.readFileSync(filePath, 'utf-8');
+            const tasksData = JSON.parse(fileData);
+
+            const fallbackPlan = [];
+            for (let i = 1; i <= 7; i++) {
+                fallbackPlan.push({
+                    day: `Day ${i}`,
+                    tasks: (tasksData.tasks || []).map((t, idx) => ({
+                        id: t.id || `static-d${i}-${idx}`,
+                        title: t.title || '未命名任務',
+                        isCompleted: t.completed || false
+                    }))
+                });
+            }
+            currentWeeklyPlan = fallbackPlan;
+            console.log("📂 [備援] 已從 tasks.json 載入靜態排程");
+
+        } catch (fileError) {
+            console.error("tasks.json 讀取失敗，使用最終防墜：", fileError.message);
+            const fallbackPlan = [];
+            for (let i = 1; i <= 7; i++) {
+                fallbackPlan.push({
+                    day: `Day ${i}`,
+                    tasks: [
+                        { id: `fb-d${i}-1`, title: `精進研讀與重點核心突破：${targetSubject}`, isCompleted: false },
+                        { id: `fb-d${i}-2`, title: `針對【${targetGoal}】進行歷屆試題實戰演練`, isCompleted: false }
+                    ]
+                });
+            }
+            currentWeeklyPlan = fallbackPlan;
         }
-        currentWeeklyPlan = fallbackPlan;
-        res.status(200).json({ status: 'success', message: '動態防墜計畫已產生' });
+
+        res.status(200).json({ status: 'success', message: '備援計畫已產生' });
     }
 };
 
-// 🎯 GET /api/tasks
 const getTasks = async (req, res) => {
     try {
         if (!currentWeeklyPlan) {

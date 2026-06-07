@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 import WelcomePage from "./pages/WelcomePage";
@@ -8,6 +8,30 @@ import SchedulePage from "./pages/SchedulePage";
 import MatchPage from "./pages/MatchPage";
 import ProgressPage from "./pages/ProgressPage";
 import LoginPage from "./pages/LoginPage";
+import { taskTemplates } from "./data/mockData";
+import {
+  clearProgressState,
+  defaultProgressState,
+  getLocalDateKey,
+} from "./services/progressStorage";
+import {
+  checkInProgress,
+  getProgress,
+  syncProgressTasks,
+  updateProgressTask,
+} from "./services/progressApi";
+
+function toProgressState(data) {
+  return {
+    checkedTasks: data.tasks
+      .filter((task) => task.isCompleted)
+      .map((task) => Number(task.id)),
+    taskDate: getLocalDateKey(),
+    streak: data.streak,
+    lastCheckInDate: data.lastCheckInDate,
+    checkInDates: data.checkInDates,
+  };
+}
 
 function App() {
   const [page, setPage] = useState("welcome");
@@ -24,26 +48,70 @@ function App() {
     sleepTime: "",
   });
 
-  const [checkedTasks, setCheckedTasks] = useState([]);
-  const [streak, setStreak] = useState(5);
-  const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const [progressState, setProgressState] = useState(defaultProgressState);
+  const today = getLocalDateKey();
+  const hasCheckedIn = progressState.lastCheckInDate === today;
+
+  useEffect(() => {
+    if (!profile.id) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadUserProgress() {
+      try {
+        let data = await getProgress(profile.id);
+
+        if (data.totalTasks === 0) {
+          data = await syncProgressTasks(
+            profile.id,
+            taskTemplates.map((_, index) => ({ id: String(index) })),
+          );
+        }
+
+        if (!cancelled) {
+          setProgressState(toProgressState(data));
+        }
+      } catch (error) {
+        console.error("載入 Progress 失敗：", error);
+        if (!cancelled) {
+          alert("無法載入學習進度，請確認後端服務已啟動。");
+        }
+      }
+    }
+
+    loadUserProgress();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile.id]);
 
   function goToPage(nextPage) {
     setPage(nextPage);
   }
 
-  function toggleTask(index) {
+  async function toggleTask(index) {
     if (hasCheckedIn) return;
 
-    if (checkedTasks.includes(index)) {
-      setCheckedTasks(checkedTasks.filter((item) => item !== index));
-    } else {
-      setCheckedTasks([...checkedTasks, index]);
+    if (!profile.id) {
+      alert("請先登入或建立學習檔案。");
+      return;
+    }
+
+    try {
+      const isCompleted = !progressState.checkedTasks.includes(index);
+      const data = await updateProgressTask(profile.id, index, isCompleted);
+      setProgressState(toProgressState(data));
+    } catch (error) {
+      console.error("更新任務失敗：", error);
+      alert(error.message || "更新任務失敗，請稍後再試。");
     }
   }
 
-  function completeCheckIn(totalTasks) {
-    if (checkedTasks.length < totalTasks) {
+  async function completeCheckIn(totalTasks) {
+    if (progressState.checkedTasks.length < totalTasks) {
       alert("請先完成所有任務再打卡。");
       return;
     }
@@ -53,9 +121,14 @@ function App() {
       return;
     }
 
-    setStreak(streak + 1);
-    setHasCheckedIn(true);
-    alert("打卡成功，連續打卡天數已更新。");
+    try {
+      const data = await checkInProgress(profile.id);
+      setProgressState(toProgressState(data));
+      alert("打卡成功，連續打卡天數已更新。");
+    } catch (error) {
+      console.error("打卡失敗：", error);
+      alert(error.message || "打卡失敗，請稍後再試。");
+    }
   }
 
   function resetDemo() {
@@ -71,9 +144,8 @@ function App() {
       wakeTime: "",
       sleepTime: "",
     });
-    setCheckedTasks([]);
-    setStreak(5);
-    setHasCheckedIn(false);
+    setProgressState(defaultProgressState);
+    clearProgressState();
   }
 
   return (
@@ -99,7 +171,7 @@ function App() {
               onLogin={() => goToPage("login")}
             />
           )}
-          
+
           {page === "login" && (
             <LoginPage
               setProfile={setProfile}
@@ -125,7 +197,7 @@ function App() {
             <SchedulePage
               profile={profile}
               goToPage={goToPage}
-              checkedTasks={checkedTasks}
+              checkedTasks={progressState.checkedTasks}
               toggleTask={toggleTask}
             />
           )}
@@ -138,9 +210,10 @@ function App() {
             <ProgressPage
               profile={profile}
               goToPage={goToPage}
-              checkedTasks={checkedTasks}
-              streak={streak}
+              checkedTasks={progressState.checkedTasks}
+              streak={progressState.streak}
               hasCheckedIn={hasCheckedIn}
+              checkInDates={progressState.checkInDates}
               completeCheckIn={completeCheckIn}
             />
           )}

@@ -1,9 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const progressController = require('../controllers/progressController');
+const express = require("express");
+const progressController = require("../controllers/progressController");
 
-router.get('/', progressController.getProgress);
-router.post('/checkin', progressController.checkIn);
-router.patch('/tasks/:id/complete', progressController.completeTask);
+const router = express.Router();
+
+router.get("/", progressController.getProgress);
+router.put("/tasks", progressController.replaceTasks);
+router.patch("/tasks/:id/complete", progressController.completeTask);
+router.post("/checkin", progressController.checkIn);
 
 module.exports = router;
