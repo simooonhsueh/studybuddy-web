@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { saveUserProfile } from "../services/userApi";
+import { useRef } from "react";
 
 function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
   const [uploadStatus, setUploadStatus] = useState("");
@@ -243,6 +244,8 @@ function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
     </section>
   );
 }
+function TimeInput({ value, onChange }) {
+  const inputRef = useRef(null);
 
 function TimeInput({ value, onChange }) {
   const inputRef = useRef(null);
