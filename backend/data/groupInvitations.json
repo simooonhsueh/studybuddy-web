@@ -1,16 +1,3 @@
 {
-  "invitations": [
-    {
-      "id": "invite-1780837940887",
-      "groupId": "group-1780837125660",
-      "groupName": "1",
-      "fromUserId": "1780837092800",
-      "fromUserName": "aa12",
-      "toUserId": "1780778748379",
-      "toUserName": "1111",
-      "status": "accepted",
-      "createdAt": "2026-06-07T13:12:20.887Z",
-      "updatedAt": "2026-06-07T13:12:35.891Z"
-    }
-  ]
+  "invitations": []
 }
