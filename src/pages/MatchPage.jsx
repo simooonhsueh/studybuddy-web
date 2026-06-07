@@ -107,7 +107,9 @@ function MatchPage({ profile, goToPage }) {
         <span>你的配對條件</span>
         <h3>{profile?.weakSubjects || "尚未設定加強科目"}</h3>
         <p>近期目標：{profile?.examGoal || "尚未填寫"}</p>
-        <p>可讀書時段：{profile?.availableTime || "尚未填寫"}</p>
+        <p>可讀書時段：{profile.availableStartTime && profile.availableEndTime
+  ? `${profile.availableStartTime} - ${profile.availableEndTime}`
+  : "尚未填寫"}</p>
       </div>
 
       <div className="summary-card">
@@ -176,7 +178,9 @@ function MatchPage({ profile, goToPage }) {
                   name={user.name}
                   subject={user.weakSubjects}
                   goal={user.examGoal}
-                  time={user.availableTime}
+                  time={user.availableStartTime && user.availableEndTime
+                  ? `${user.availableStartTime} - ${user.availableEndTime}`
+                  : user.availableTime || "尚未填寫"}
                   matchRate={user.matchScore}
                   reasons={user.reasons || []}
                   status={user.reasons?.[0] || "可配對"}

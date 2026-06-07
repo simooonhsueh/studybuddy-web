@@ -1,96 +1,6 @@
 {
   "users": {
-    "1780813631267": {
-      "tasks": [
-        {
-          "id": "1a2b3c4d",
-          "isCompleted": true
-        },
-        {
-          "id": "2b3c4d5e",
-          "isCompleted": true
-        },
-        {
-          "id": "3c4d5e6f",
-          "isCompleted": true
-        }
-      ],
-      "taskDate": "2026-06-07",
-      "streak": 1,
-      "lastCheckInDate": "2026-06-07",
-      "checkInDates": [
-        "2026-06-07"
-      ]
-    },
-    "1780813799161": {
-      "tasks": [
-        {
-          "id": "0",
-          "isCompleted": false
-        },
-        {
-          "id": "1",
-          "isCompleted": false
-        },
-        {
-          "id": "2",
-          "isCompleted": false
-        },
-        {
-          "id": "3",
-          "isCompleted": false
-        }
-      ],
-      "taskDate": "2026-06-07",
-      "streak": 0,
-      "lastCheckInDate": null,
-      "checkInDates": []
-    },
-    "1780813988124": {
-      "tasks": [
-        {
-          "id": "0",
-          "isCompleted": false
-        },
-        {
-          "id": "1",
-          "isCompleted": false
-        },
-        {
-          "id": "2",
-          "isCompleted": false
-        },
-        {
-          "id": "3",
-          "isCompleted": false
-        }
-      ],
-      "taskDate": "2026-06-07",
-      "streak": 0,
-      "lastCheckInDate": null,
-      "checkInDates": []
-    },
-    "1780821762025": {
-      "tasks": [
-        {
-          "id": "abc123",
-          "isCompleted": false
-        },
-        {
-          "id": "def456",
-          "isCompleted": false
-        },
-        {
-          "id": "ghi789",
-          "isCompleted": false
-        }
-      ],
-      "taskDate": "2026-06-07",
-      "streak": 0,
-      "lastCheckInDate": null,
-      "checkInDates": []
-    },
-    "1780832703618": {
+    "1781000000001": {
       "tasks": [
         {
           "id": "a1b2c3d4",
@@ -102,61 +12,171 @@
         },
         {
           "id": "i9j0k1l2",
+          "isCompleted": true
+        }
+      ],
+      "taskDate": "2026-06-08",
+      "streak": 3,
+      "lastCheckInDate": "2026-06-08",
+      "checkInDates": [
+        "2026-06-06",
+        "2026-06-07",
+        "2026-06-08"
+      ]
+    },
+    "1781000000002": {
+      "tasks": [
+        {
+          "id": "task-brian-001",
+          "title": "函數題型練習",
+          "isCompleted": true
+        },
+        {
+          "id": "task-brian-002",
+          "title": "排列組合觀念複習",
+          "isCompleted": false
+        },
+        {
+          "id": "task-brian-003",
+          "title": "數學錯題訂正",
           "isCompleted": false
         }
       ],
-      "taskDate": "2026-06-07",
+      "taskDate": "2026-06-08",
+      "streak": 1,
+      "lastCheckInDate": "2026-06-07",
+      "checkInDates": [
+        "2026-06-07"
+      ]
+    },
+    "1781000000003": {
+      "tasks": [
+        {
+          "id": "task-cindy-001",
+          "title": "資料結構樹狀結構複習",
+          "isCompleted": true
+        },
+        {
+          "id": "task-cindy-002",
+          "title": "圖形演算法練習",
+          "isCompleted": true
+        },
+        {
+          "id": "task-cindy-003",
+          "title": "完成作業測資測試",
+          "isCompleted": true
+        }
+      ],
+      "taskDate": "2026-06-08",
+      "streak": 3,
+      "lastCheckInDate": "2026-06-08",
+      "checkInDates": [
+        "2026-06-06",
+        "2026-06-07",
+        "2026-06-08"
+      ]
+    },
+    "1781000000004": {
+      "tasks": [
+        {
+          "id": "task-david-001",
+          "title": "Memory Management 整理",
+          "isCompleted": false
+        },
+        {
+          "id": "task-david-002",
+          "title": "Process Scheduling 題目練習",
+          "isCompleted": false
+        },
+        {
+          "id": "task-david-003",
+          "title": "作業系統重點筆記",
+          "isCompleted": false
+        }
+      ],
+      "taskDate": "2026-06-08",
       "streak": 0,
       "lastCheckInDate": null,
       "checkInDates": []
     },
-    "1780778748379": {
+    "1781000000005": {
       "tasks": [
         {
-          "id": "task1a2b3c",
+          "id": "task-eason-001",
+          "title": "化學反應式平衡練習",
           "isCompleted": true
         },
         {
-          "id": "task4d5e6f",
+          "id": "task-eason-002",
+          "title": "化學計算題練習",
+          "isCompleted": false
+        },
+        {
+          "id": "task-eason-003",
+          "title": "有機化學重點整理",
           "isCompleted": false
         }
       ],
-      "taskDate": "2026-06-07",
-      "streak": 0,
-      "lastCheckInDate": null,
-      "checkInDates": []
+      "taskDate": "2026-06-08",
+      "streak": 1,
+      "lastCheckInDate": "2026-06-07",
+      "checkInDates": [
+        "2026-06-07"
+      ]
     },
-    "1780836079454": {
+    "1781000000006": {
       "tasks": [
         {
-          "id": "task1",
+          "id": "task-fiona-001",
+          "title": "托福閱讀文章練習",
           "isCompleted": true
         },
         {
-          "id": "task2",
+          "id": "task-fiona-002",
+          "title": "托福聽力筆記訓練",
+          "isCompleted": true
+        },
+        {
+          "id": "task-fiona-003",
+          "title": "英文口說錄音練習",
           "isCompleted": false
         }
       ],
-      "taskDate": "2026-06-07",
-      "streak": 0,
-      "lastCheckInDate": null,
-      "checkInDates": []
+      "taskDate": "2026-06-08",
+      "streak": 2,
+      "lastCheckInDate": "2026-06-07",
+      "checkInDates": [
+        "2026-06-06",
+        "2026-06-07"
+      ]
     },
-    "1780837092800": {
+    "1781000000007": {
       "tasks": [
         {
-          "id": "a1b2c3d4",
+          "id": "task-simon-001",
+          "title": "整理 React 頁面路由",
           "isCompleted": true
         },
         {
-          "id": "e5f6g7h8",
+          "id": "task-simon-002",
+          "title": "測試 Node.js API",
+          "isCompleted": true
+        },
+        {
+          "id": "task-simon-003",
+          "title": "修正 Git merge conflict",
           "isCompleted": false
         }
       ],
-      "taskDate": "2026-06-07",
-      "streak": 0,
-      "lastCheckInDate": null,
-      "checkInDates": []
+      "taskDate": "2026-06-08",
+      "streak": 4,
+      "lastCheckInDate": "2026-06-08",
+      "checkInDates": [
+        "2026-06-05",
+        "2026-06-06",
+        "2026-06-07",
+        "2026-06-08"
+      ]
     }
   }
 }

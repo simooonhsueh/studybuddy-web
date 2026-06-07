@@ -10,55 +10,99 @@ function SchedulePage({ profile, goToPage, checkedTasks, toggleTask, weeklyPlan,
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    // ✅ 已有排程就直接顯示，不再呼叫 OpenAI
-    if (weeklyPlan) {
+    const userId = profile?.id || profile?.name || "guest";
+    const storageKey = `studybuddy-weekly-plan-${userId}`;
+
+    // 1. 如果 App.jsx 已經有 weeklyPlan，就直接用，不重新呼叫 AI
+    if (weeklyPlan && weeklyPlan.length > 0) {
       setLocalPlan(weeklyPlan);
       setLoading(false);
+
+      localStorage.setItem(storageKey, JSON.stringify(weeklyPlan));
       return;
     }
 
+    // 2. 如果 localStorage 已經有這個使用者的排程，就直接讀出來
+    const savedPlan = localStorage.getItem(storageKey);
+
+    if (savedPlan) {
+      try {
+        const parsedPlan = JSON.parse(savedPlan);
+
+        if (Array.isArray(parsedPlan) && parsedPlan.length > 0) {
+          setLocalPlan(parsedPlan);
+          setLoading(false);
+
+          if (onPlanLoaded) {
+            onPlanLoaded(parsedPlan);
+          }
+
+          console.log(`✅ 已載入 ${profile?.name || "guest"} 的既有排程`);
+          return;
+        }
+      } catch (error) {
+        console.error("讀取 localStorage 排程失敗：", error);
+        localStorage.removeItem(storageKey);
+      }
+    }
+
+    // 3. 避免同一次 render 重複 fetch
     if (hasFetched.current) return;
     hasFetched.current = true;
 
     const currentName = profile?.name || "guest";
+
     console.log(`🔑 [前端發送] 帳號【${currentName}】，首次產生排程...`);
 
-    fetch('http://localhost:5000/api/generate-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: currentName })
+    fetch("http://localhost:5000/api/generate-plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: profile?.id,
+        name: currentName,
+        profile,
+      }),
     })
       .then((res) => {
-        if (!res.ok) throw new Error('AI 動態排程刷新失敗，請檢查後端連線。');
+        if (!res.ok) {
+          throw new Error("AI 動態排程刷新失敗，請檢查後端連線。");
+        }
+
         return res.json();
       })
-      .then(() => fetch('http://localhost:5000/api/tasks'))
+      .then(() => fetch("http://localhost:5000/api/tasks"))
       .then((resTasks) => {
-        if (!resTasks.ok) throw new Error('無法從 /api/tasks 取得排程清單');
+        if (!resTasks.ok) {
+          throw new Error("無法從 /api/tasks 取得排程清單");
+        }
+
         return resTasks.json();
       })
       .then((tasksData) => {
-        let finalPlan = tasksData.weeklyPlan || tasksData.data || tasksData || [];
+        const finalPlan = tasksData.weeklyPlan || tasksData.data || tasksData || [];
 
         const standardizedPlan = finalPlan.slice(0, 7).map((plan, index) => ({
           ...plan,
-          day: `Day ${index + 1}`
+          day: `Day ${index + 1}`,
         }));
 
         setLocalPlan(standardizedPlan);
         setLoading(false);
 
-        // ✅ 通知 App 存起來，下次進來直接用
+        // 4. 新產生的排程存到 App state
         if (onPlanLoaded) {
           onPlanLoaded(standardizedPlan);
         }
+
+        // 5. 新產生的排程也存到 localStorage
+        localStorage.setItem(storageKey, JSON.stringify(standardizedPlan));
       })
       .catch((err) => {
         console.error("💥 排程頁面串接發生錯誤:", err);
         setError(err.message);
         setLoading(false);
       });
-  }, [weeklyPlan]);
+  }, [profile?.id, profile?.name, weeklyPlan, onPlanLoaded]);
 
   const getCalculatedDate = (dayString) => {
     const dayNum = parseInt(dayString.replace("Day ", ""), 10);
@@ -92,7 +136,7 @@ function SchedulePage({ profile, goToPage, checkedTasks, toggleTask, weeklyPlan,
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', color: '#ffffff' }}>
       <button className="back-button" onClick={() => goToPage("hub")}>返回主介面</button>
 
-      <h2 style={{ marginTop: '16px' }}>📅 你的 AI 智慧排程計畫</h2>
+      <h2 className = "screen-title"style={{ marginTop: '16px' }}>📅 你的 AI 智慧排程計畫</h2>
       <p style={{ color: '#aaa' }}>根據你的目標，AI 已為你量身打造以下計畫：</p>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '10px' }}>

@@ -7,6 +7,7 @@ const {
   getProfile,
   saveProfile,
   loginProfile,
+  updateProfile,
   parseSchedule,
 } = require("../controllers/userController");
 
@@ -14,5 +15,6 @@ router.get("/profile", getProfile);
 router.post("/profile", saveProfile);
 router.post("/login", loginProfile);
 router.post("/parse-schedule", upload.single('schedule'), parseSchedule);
+router.patch("/profile/:id", updateProfile);
 
 module.exports = router;

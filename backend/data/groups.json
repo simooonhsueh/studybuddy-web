@@ -1,23 +1,56 @@
 {
   "groups": [
     {
-      "id": "group-1780837125660",
-      "name": "1",
-      "ownerId": "1780837092800",
-      "ownerName": "aa12",
+      "id": "group-1781000000001",
+      "name": "英文段考衝刺小組",
+      "ownerId": "1781000000001",
+      "ownerName": "Amy",
       "members": [
         {
-          "id": "1780837092800",
-          "name": "aa12",
+          "id": "1781000000001",
+          "name": "Amy",
           "role": "owner"
         },
         {
-          "id": "1780778748379",
-          "name": "1111",
+          "id": "1781000000006",
+          "name": "Fiona",
           "role": "member"
         }
       ],
-      "createdAt": "2026-06-07T12:58:45.660Z"
+      "createdAt": "2026-06-07T09:00:00.000Z"
+    },
+    {
+      "id": "group-1781000000002",
+      "name": "數學期末讀書會",
+      "ownerId": "1781000000002",
+      "ownerName": "Brian",
+      "members": [
+        {
+          "id": "1781000000002",
+          "name": "Brian",
+          "role": "owner"
+        }
+      ],
+      "createdAt": "2026-06-07T09:10:00.000Z"
+    },
+    {
+      "id": "group-1781000000003",
+      "name": "資工專題整合小組",
+      "ownerId": "1781000000007",
+      "ownerName": "Simon",
+      "members": [
+        {
+          "id": "1781000000007",
+          "name": "Simon",
+          "role": "owner"
+        },
+        {
+          "id": "1781000000003",
+          "name": "Cindy",
+          "role": "member"
+        }
+      ],
+      "createdAt": "2026-06-07T09:20:00.000Z"
     }
   ]
 }

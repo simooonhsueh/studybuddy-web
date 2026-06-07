@@ -17,12 +17,19 @@ function MainHubPage({ profile, goToPage }) {
     <section className="screen">
       <p className="section-label">Learning Hub</p>
       <h2 className="screen-title">歡迎，{profile.name}</h2>
-
+      <button
+        className="secondary-button"
+        onClick={() => goToPage("editProfile")}
+      >
+        修改個人資料
+      </button>
       {/* 個人摘要 */}
       <div className="summary-card">
         <span>近期測驗目標</span>
         <h3>{profile.examGoal || "尚未填寫"}</h3>
-        <p>可讀書時段：{profile.availableTime || "尚未填寫"}</p>
+        <p>可讀書時段：{profile.availableStartTime && profile.availableEndTime
+  ? `${profile.availableStartTime} - ${profile.availableEndTime}`
+  : "尚未填寫"}</p>
         <p>想加強科目：{weakDisplay}</p>
         <p>擅長科目：{preferredDisplay}</p>
       </div>

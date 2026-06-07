@@ -261,3 +261,21 @@ export async function getGroupProgress(groupId, viewerId) {
 
   return result;
 }
+
+export async function updateUserProfile(id, profile) {
+  const response = await fetch(`${API_BASE_URL}/user/profile/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(profile),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to update profile");
+  }
+
+  return result;
+}
