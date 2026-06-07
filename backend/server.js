@@ -6,6 +6,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const matchRoutes = require('./routes/matchRoutes');
+const groupRoutes = require("./routes/groupRoutes");
 
 // 💡 關鍵引入：直接把你的 taskController 抓進來用
 const taskController = require('./controllers/taskController');
@@ -28,6 +29,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/progress', progressRoutes);
 // 企劃書裡的 checkin 寫在根目錄，我們把它掛進 progress 裡比較好管理，前端呼叫 /api/progress/checkin
 app.use('/api/match', matchRoutes);
+app.use("/api/groups", groupRoutes);
 
 // 🔥 【超級大修正】不要在這裡寫死 res.json！
 // 讓前端 POST /api/generate-plan 時，真正走進你的 taskController 裡去跑 OpenAI 大腦！

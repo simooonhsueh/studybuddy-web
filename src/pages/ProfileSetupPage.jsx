@@ -155,6 +155,20 @@ function ProfileSetupPage({ profile, setProfile, onSubmit, goToPage }) {
         </label>
 
         <label>
+          進度公開範圍
+          <select
+            value={profile.progressVisibility}
+            onChange={(event) =>
+              updateField("progressVisibility", event.target.value)
+            }
+          >
+            <option value="public">公開給所有人</option>
+            <option value="group">只公開給群組成員</option>
+            <option value="private">只有自己可見</option>
+          </select>
+        </label>
+
+        <label>
           起床時間
           <TimeInput
             value={profile.wakeTime}

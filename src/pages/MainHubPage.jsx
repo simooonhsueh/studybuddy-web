@@ -44,6 +44,12 @@ function MainHubPage({ profile, goToPage }) {
         />
 
         <FeatureButton
+          title="我的讀書群組"
+          description="建立群組、邀請學伴、查看群組進度"
+          onClick={() => goToPage("groups")}
+        />
+
+        <FeatureButton
           title="Streak 進度追蹤"
           description="追蹤任務完成率、連續打卡與本週學習狀態。"
           meta="Track"

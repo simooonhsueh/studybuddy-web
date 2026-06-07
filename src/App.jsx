@@ -8,6 +8,7 @@ import SchedulePage from "./pages/SchedulePage";
 import MatchPage from "./pages/MatchPage";
 import ProgressPage from "./pages/ProgressPage";
 import LoginPage from "./pages/LoginPage";
+import GroupPage from "./pages/GroupPage";
 import {
   clearProgressState,
   defaultProgressState,
@@ -44,6 +45,7 @@ function App() {
     availableTime: "",
     wakeTime: "",
     sleepTime: "",
+    progressVisibility: "group",
   });
 
   // ✅ 新增：把排程結果存在 App 層級，不會因為換頁而消失
@@ -81,7 +83,7 @@ function App() {
     setProfile({
       name: "", examGoal: "", examDate: "", dailyStudyHours: "",
       preferredSubjects: "", weakSubjects: "", availableTime: "",
-      wakeTime: "", sleepTime: "",
+      wakeTime: "", sleepTime: "",progressVisibility: "group",
     });
     setProgressState(defaultProgressState);
     setWeeklyPlan(null);
@@ -197,6 +199,7 @@ function App() {
           {page === "match" && (
             <MatchPage profile={profile} goToPage={goToPage} />
           )}
+          {page === "groups" && <GroupPage profile={profile} goToPage={goToPage} />}
           {page === "progress" && (
             <ProgressPage
               profile={profile}
