@@ -1,5 +1,4 @@
 import ProgressBar from "../components/ProgressBar";
-import { taskTemplates } from "../data/mockData";
 
 function getCurrentWeek(checkInDates) {
   return Array.from({ length: 7 }, (_, index) => {
@@ -30,11 +29,12 @@ function ProgressPage({
   hasCheckedIn,
   checkInDates,
   completeCheckIn,
+  totalTasks,   // ✅ 從 App 傳入，對應 AI 排程今日任務數
 }) {
-  const totalTasks = taskTemplates.length;
+  const safeTotalTasks = totalTasks ?? 0;
   const progress =
-    totalTasks === 0 ? 0 : Math.round((checkedTasks.length / totalTasks) * 100);
-  const allTasksCompleted = totalTasks > 0 && checkedTasks.length === totalTasks;
+    safeTotalTasks === 0 ? 0 : Math.round((checkedTasks.length / safeTotalTasks) * 100);
+  const allTasksCompleted = safeTotalTasks > 0 && checkedTasks.length >= safeTotalTasks;
   const weekDays = getCurrentWeek(checkInDates);
   const weeklyCompletedDays = weekDays.filter((day) => day.completed).length;
 
@@ -59,11 +59,10 @@ function ProgressPage({
           <span>連續打卡</span>
           <strong>{streak} 天</strong>
         </div>
-
         <div className="stat-card">
           <span>今日完成</span>
           <strong>
-            {checkedTasks.length} / {totalTasks}
+            {checkedTasks.length} / {safeTotalTasks === 0 ? "—" : safeTotalTasks}
           </strong>
         </div>
       </div>
@@ -72,7 +71,9 @@ function ProgressPage({
         label="今日任務完成率"
         value={progress}
         helperText={
-          hasCheckedIn
+          safeTotalTasks === 0
+            ? "請先前往 AI 學習排程產生今日任務。"
+            : hasCheckedIn
             ? "今日已完成打卡。"
             : "完成所有任務後即可進行今日打卡。"
         }
@@ -96,7 +97,7 @@ function ProgressPage({
 
       <button
         className="primary-button"
-        onClick={() => completeCheckIn(totalTasks)}
+        onClick={() => completeCheckIn(safeTotalTasks)}
         disabled={!allTasksCompleted || hasCheckedIn}
       >
         {hasCheckedIn ? "今日已完成打卡" : "完成今日任務並打卡"}

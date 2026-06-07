@@ -8,7 +8,6 @@ import SchedulePage from "./pages/SchedulePage";
 import MatchPage from "./pages/MatchPage";
 import ProgressPage from "./pages/ProgressPage";
 import LoginPage from "./pages/LoginPage";
-import { taskTemplates } from "./data/mockData";
 import {
   clearProgressState,
   defaultProgressState,
@@ -25,7 +24,7 @@ function toProgressState(data) {
   return {
     checkedTasks: data.tasks
       .filter((task) => task.isCompleted)
-      .map((task) => Number(task.id)),
+      .map((task) => String(task.id)),
     taskDate: getLocalDateKey(),
     streak: data.streak,
     lastCheckInDate: data.lastCheckInDate,
@@ -35,7 +34,6 @@ function toProgressState(data) {
 
 function App() {
   const [page, setPage] = useState("welcome");
-
   const [profile, setProfile] = useState({
     name: "",
     examGoal: "",
@@ -48,28 +46,20 @@ function App() {
     sleepTime: "",
   });
 
+  // ✅ 新增：把排程結果存在 App 層級，不會因為換頁而消失
+  const [weeklyPlan, setWeeklyPlan] = useState(null);
+
   const [progressState, setProgressState] = useState(defaultProgressState);
   const today = getLocalDateKey();
   const hasCheckedIn = progressState.lastCheckInDate === today;
 
   useEffect(() => {
-    if (!profile.id) {
-      return;
-    }
-
+    if (!profile.id) return;
     let cancelled = false;
 
     async function loadUserProgress() {
       try {
-        let data = await getProgress(profile.id);
-
-        if (data.totalTasks === 0) {
-          data = await syncProgressTasks(
-            profile.id,
-            taskTemplates.map((_, index) => ({ id: String(index) })),
-          );
-        }
-
+        const data = await getProgress(profile.id);
         if (!cancelled) {
           setProgressState(toProgressState(data));
         }
@@ -82,27 +72,52 @@ function App() {
     }
 
     loadUserProgress();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [profile.id]);
+
+  // ✅ 登出時也清除排程
+  function resetDemo() {
+    setPage("welcome");
+    setProfile({
+      name: "", examGoal: "", examDate: "", dailyStudyHours: "",
+      preferredSubjects: "", weakSubjects: "", availableTime: "",
+      wakeTime: "", sleepTime: "",
+    });
+    setProgressState(defaultProgressState);
+    setWeeklyPlan(null);
+    clearProgressState();
+  }
 
   function goToPage(nextPage) {
     setPage(nextPage);
   }
 
-  async function toggleTask(index) {
-    if (hasCheckedIn) return;
+  // ✅ AI 排程載入後：存排程 + 同步今日任務到 Progress
+  async function handlePlanLoaded(plan) {
+    setWeeklyPlan(plan);
 
+    if (!profile.id || plan.length === 0) return;
+    const todayTasks = plan[0].tasks || [];
+    if (todayTasks.length === 0) return;
+
+    try {
+      const tasks = todayTasks.map((task) => ({ id: String(task.id) }));
+      const data = await syncProgressTasks(profile.id, tasks);
+      setProgressState(toProgressState(data));
+    } catch (error) {
+      console.error("同步 AI 任務到 Progress 失敗：", error);
+    }
+  }
+
+  async function toggleTask(taskId) {
+    if (hasCheckedIn) return;
     if (!profile.id) {
       alert("請先登入或建立學習檔案。");
       return;
     }
-
     try {
-      const isCompleted = !progressState.checkedTasks.includes(index);
-      const data = await updateProgressTask(profile.id, index, isCompleted);
+      const isCompleted = !progressState.checkedTasks.includes(String(taskId));
+      const data = await updateProgressTask(profile.id, taskId, isCompleted);
       setProgressState(toProgressState(data));
     } catch (error) {
       console.error("更新任務失敗：", error);
@@ -115,12 +130,10 @@ function App() {
       alert("請先完成所有任務再打卡。");
       return;
     }
-
     if (hasCheckedIn) {
       alert("今日已完成打卡。");
       return;
     }
-
     try {
       const data = await checkInProgress(profile.id);
       setProgressState(toProgressState(data));
@@ -131,23 +144,6 @@ function App() {
     }
   }
 
-  function resetDemo() {
-    setPage("welcome");
-    setProfile({
-      name: "",
-      examGoal: "",
-      examDate: "",
-      dailyStudyHours: "",
-      preferredSubjects: "",
-      weakSubjects: "",
-      availableTime: "",
-      wakeTime: "",
-      sleepTime: "",
-    });
-    setProgressState(defaultProgressState);
-    clearProgressState();
-  }
-
   return (
     <div className="app-bg">
       <div className="app-frame">
@@ -156,7 +152,6 @@ function App() {
             <span className="brand-title">StudyBuddy AI</span>
             <span className="brand-subtitle">Learning Management</span>
           </button>
-
           {page !== "welcome" && page !== "login" && page !== "profile" && (
             <button className="header-action" onClick={resetDemo}>
               Log out
@@ -171,7 +166,6 @@ function App() {
               onLogin={() => goToPage("login")}
             />
           )}
-
           {page === "login" && (
             <LoginPage
               setProfile={setProfile}
@@ -179,7 +173,6 @@ function App() {
               goToPage={goToPage}
             />
           )}
-
           {page === "profile" && (
             <ProfileSetupPage
               profile={profile}
@@ -188,24 +181,22 @@ function App() {
               goToPage={goToPage}
             />
           )}
-
           {page === "hub" && (
             <MainHubPage profile={profile} goToPage={goToPage} />
           )}
-
           {page === "schedule" && (
             <SchedulePage
               profile={profile}
               goToPage={goToPage}
               checkedTasks={progressState.checkedTasks}
               toggleTask={toggleTask}
+              weeklyPlan={weeklyPlan}
+              onPlanLoaded={handlePlanLoaded}
             />
           )}
-
           {page === "match" && (
             <MatchPage profile={profile} goToPage={goToPage} />
           )}
-
           {page === "progress" && (
             <ProgressPage
               profile={profile}
@@ -215,6 +206,8 @@ function App() {
               hasCheckedIn={hasCheckedIn}
               checkInDates={progressState.checkInDates}
               completeCheckIn={completeCheckIn}
+              // ✅ 傳入今日實際任務數量
+              totalTasks={weeklyPlan?.[0]?.tasks?.length ?? 0}
             />
           )}
         </main>
