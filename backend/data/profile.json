@@ -130,5 +130,37 @@
       }
     ],
     "createdAt": "2026-06-07T08:30:00.000Z"
+  },
+  {
+    "id": 1780893956890,
+    "name": "Jackson",
+    "examGoal": "國文100分",
+    "examDate": "2026-06-18",
+    "dailyStudyHours": "10",
+    "preferredSubjects": "騎腳踏車",
+    "weakSubjects": "英文",
+    "availableStartTime": "00:44",
+    "availableEndTime": "12:44",
+    "wakeTime": "12:44",
+    "sleepTime": "00:45",
+    "progressVisibility": "group",
+    "createdAt": "2026-06-08T04:45:56.891Z",
+    "updatedAt": "2026-06-08T08:34:39.160Z"
+  },
+  {
+    "id": 1780907810073,
+    "name": "123",
+    "examGoal": "作業系統期末90",
+    "examDate": "2026-06-26",
+    "dailyStudyHours": "5",
+    "preferredSubjects": "Memory Management、Process Scheduling",
+    "weakSubjects": "英文口說",
+    "availableStartTime": "16:36",
+    "availableEndTime": "21:36",
+    "wakeTime": "08:36",
+    "sleepTime": "22:36",
+    "progressVisibility": "group",
+    "createdAt": "2026-06-08T08:36:50.073Z",
+    "updatedAt": "2026-06-08T09:05:55.777Z"
   }
 ]
