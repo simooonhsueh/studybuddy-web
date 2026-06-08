@@ -4,10 +4,18 @@ const path = require("path");
 const filePath = path.join(__dirname, "../data/profile.json");
 
 function readProfiles() {
-  if (!fs.existsSync(filePath)) return [];
+  if (!fs.existsSync(filePath)) {
+    return [];
+  }
+
   const fileContent = fs.readFileSync(filePath, "utf-8");
-  if (!fileContent.trim()) return [];
+
+  if (!fileContent.trim()) {
+    return [];
+  }
+
   const data = JSON.parse(fileContent);
+
   return Array.isArray(data) ? data : [];
 }
 
@@ -18,10 +26,18 @@ function writeProfiles(profiles) {
 const getProfile = (req, res) => {
   try {
     const profiles = readProfiles();
-    res.status(200).json({ status: "success", data: profiles });
+
+    res.status(200).json({
+      status: "success",
+      data: profiles,
+    });
   } catch (error) {
     console.error("讀取 profile 失敗：", error);
-    res.status(500).json({ status: "error", message: "讀取 profile 失敗" });
+
+    res.status(500).json({
+      status: "error",
+      message: "讀取 profile 失敗",
+    });
   }
 };
 
@@ -31,32 +47,53 @@ const saveProfile = (req, res) => {
     const newProfile = req.body;
 
     if (!newProfile.name || !newProfile.name.trim()) {
-      return res.status(400).json({ status: "error", message: "使用者名稱不能為空" });
+      return res.status(400).json({
+        status: "error",
+        message: "使用者名稱不能為空",
+      });
     }
 
     const inputName = newProfile.name.trim().toLowerCase();
+
     const nameExists = profiles.some(
-      (p) => p.name && p.name.trim().toLowerCase() === inputName
+      (profile) =>
+        profile.name &&
+        profile.name.trim().toLowerCase() === inputName
     );
 
     if (nameExists) {
-      return res.status(409).json({ status: "error", message: "此使用者名稱已存在，請換一個名稱" });
+      return res.status(409).json({
+        status: "error",
+        message: "此使用者名稱已存在，請換一個名稱",
+      });
     }
 
     const profileToSave = {
-      id: Date.now(),
       ...newProfile,
+
+      // 重要：id 要放在 ...newProfile 後面，才不會被前端的 id: "" 蓋掉
+      id: Date.now(),
+
       name: newProfile.name.trim(),
+      progressVisibility: newProfile.progressVisibility || "group",
       createdAt: new Date().toISOString(),
     };
 
     profiles.push(profileToSave);
     writeProfiles(profiles);
 
-    res.status(201).json({ status: "success", message: "設定已儲存", data: profileToSave });
+    res.status(201).json({
+      status: "success",
+      message: "設定已儲存",
+      data: profileToSave,
+    });
   } catch (error) {
     console.error("儲存 profile 失敗：", error);
-    res.status(500).json({ status: "error", message: "儲存 profile 失敗" });
+
+    res.status(500).json({
+      status: "error",
+      message: "儲存 profile 失敗",
+    });
   }
 };
 
@@ -66,22 +103,39 @@ const loginProfile = (req, res) => {
     const { name } = req.body;
 
     if (!name || !name.trim()) {
-      return res.status(400).json({ status: "error", message: "請輸入使用者名稱" });
+      return res.status(400).json({
+        status: "error",
+        message: "請輸入使用者名稱",
+      });
     }
 
     const inputName = name.trim().toLowerCase();
+
     const user = profiles.find(
-      (p) => p.name && p.name.trim().toLowerCase() === inputName
+      (profile) =>
+        profile.name &&
+        profile.name.trim().toLowerCase() === inputName
     );
 
     if (!user) {
-      return res.status(404).json({ status: "error", message: "找不到此使用者，請確認名稱是否正確" });
+      return res.status(404).json({
+        status: "error",
+        message: "找不到此使用者，請確認名稱是否正確",
+      });
     }
 
-    res.status(200).json({ status: "success", message: "登入成功", data: user });
+    res.status(200).json({
+      status: "success",
+      message: "登入成功",
+      data: user,
+    });
   } catch (error) {
     console.error("登入失敗：", error);
-    res.status(500).json({ status: "error", message: "登入失敗" });
+
+    res.status(500).json({
+      status: "error",
+      message: "登入失敗",
+    });
   }
 };
 
@@ -130,8 +184,15 @@ const updateProfile = (req, res) => {
     const profileToUpdate = {
       ...oldProfile,
       ...updatedProfile,
+
+      // 重要：修改資料時 id 永遠保留原本的，不給前端覆蓋
       id: oldProfile.id,
+
       name: updatedProfile.name.trim(),
+      progressVisibility:
+        updatedProfile.progressVisibility ||
+        oldProfile.progressVisibility ||
+        "group",
       updatedAt: new Date().toISOString(),
     };
 
@@ -155,21 +216,41 @@ const updateProfile = (req, res) => {
 
 // ── PDF 解析：上傳到 OpenAI Files → Responses API 讀取 → 刪除暫存 ───────────
 const { OpenAI, toFile } = require("openai");
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+let openai = null;
+
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 const parseSchedule = async (req, res) => {
   let uploadedFileId = null;
 
   try {
-    if (!req.file) {
-      return res.status(400).json({ status: "error", message: "請上傳 PDF 檔案" });
+    if (!openai) {
+      return res.status(500).json({
+        status: "error",
+        message: "尚未設定 OPENAI_API_KEY，無法解析課表 PDF",
+      });
     }
 
-    // Step 1：把 PDF buffer 上傳到 OpenAI Files（用途設為 user_data）
+    if (!req.file) {
+      return res.status(400).json({
+        status: "error",
+        message: "請上傳 PDF 檔案",
+      });
+    }
+
+    // Step 1：把 PDF buffer 上傳到 OpenAI Files
     const uploadedFile = await openai.files.create({
-      file: await toFile(req.file.buffer, "schedule.pdf", { type: "application/pdf" }),
+      file: await toFile(req.file.buffer, "schedule.pdf", {
+        type: "application/pdf",
+      }),
       purpose: "user_data",
     });
+
     uploadedFileId = uploadedFile.id;
 
     // Step 2：用 Responses API 讓 GPT 讀取這份 PDF
@@ -203,18 +284,32 @@ const parseSchedule = async (req, res) => {
     // Step 3：解析回傳的 JSON
     let jsonText = response.output_text.trim();
     jsonText = jsonText.replace(/```json|```/g, "").trim();
+
     const courses = JSON.parse(jsonText);
 
-    res.status(200).json({ status: "success", data: courses });
+    res.status(200).json({
+      status: "success",
+      data: courses,
+    });
   } catch (error) {
     console.error("解析課表失敗：", error);
-    res.status(500).json({ status: "error", message: "課表解析失敗，請稍後再試" });
+
+    res.status(500).json({
+      status: "error",
+      message: "課表解析失敗，請稍後再試",
+    });
   } finally {
     // Step 4：不論成功失敗，都刪除 OpenAI 上的暫存檔案
-    if (uploadedFileId) {
+    if (uploadedFileId && openai) {
       openai.files.delete(uploadedFileId).catch(() => {});
     }
   }
 };
 
-module.exports = { getProfile, saveProfile, loginProfile, updateProfile, parseSchedule };
+module.exports = {
+  getProfile,
+  saveProfile,
+  loginProfile,
+  updateProfile,
+  parseSchedule,
+};
