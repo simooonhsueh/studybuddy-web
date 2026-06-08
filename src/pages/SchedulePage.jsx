@@ -1,197 +1,219 @@
-import React, { useState, useEffect, useRef } from 'react';
-import TaskCard from '../components/TaskCard';
+import React, { useEffect, useRef, useState } from "react";
+import TaskCard from "../components/TaskCard";
+import { generatePlan, getTasks, replaceProgressTasks } from "../services/userApi";
 
-function SchedulePage({ profile, goToPage, checkedTasks, toggleTask, weeklyPlan, onPlanLoaded }) {
+function SchedulePage({
+  profile,
+  goToPage,
+  checkedTasks,
+  toggleTask,
+  weeklyPlan,
+  onPlanLoaded,
+}) {
   const [localPlan, setLocalPlan] = useState(weeklyPlan || []);
   const [selectedDay, setSelectedDay] = useState("Day 1");
-  const [loading, setLoading] = useState(!weeklyPlan);  // ✅ 已有排程就不 loading
-  const [error, setError] = useState(null);
-
+  const [loading, setLoading] = useState(!weeklyPlan);
+  const [error, setError] = useState("");
   const hasFetched = useRef(false);
 
-  useEffect(() => {
-    const userId = profile?.id || profile?.name || "guest";
-    const storageKey = `studybuddy-weekly-plan-${userId}`;
+  const userId = profile?.id || profile?.name || "guest";
+  const storageKey = `studybuddy-weekly-plan-${userId}`;
 
-    // 1. 如果 App.jsx 已經有 weeklyPlan，就直接用，不重新呼叫 AI
-    if (weeklyPlan && weeklyPlan.length > 0) {
-      setLocalPlan(weeklyPlan);
-      setLoading(false);
+  function getCalculatedDate(dayString) {
+    const dayNum = parseInt(String(dayString).replace("Day ", ""), 10);
+    if (Number.isNaN(dayNum)) return "";
 
-      localStorage.setItem(storageKey, JSON.stringify(weeklyPlan));
-      return;
-    }
-
-    // 2. 如果 localStorage 已經有這個使用者的排程，就直接讀出來
-    const savedPlan = localStorage.getItem(storageKey);
-
-    if (savedPlan) {
-      try {
-        const parsedPlan = JSON.parse(savedPlan);
-
-        if (Array.isArray(parsedPlan) && parsedPlan.length > 0) {
-          setLocalPlan(parsedPlan);
-          setLoading(false);
-
-          if (onPlanLoaded) {
-            onPlanLoaded(parsedPlan);
-          }
-
-          console.log(`✅ 已載入 ${profile?.name || "guest"} 的既有排程`);
-          return;
-        }
-      } catch (error) {
-        console.error("讀取 localStorage 排程失敗：", error);
-        localStorage.removeItem(storageKey);
-      }
-    }
-
-    // 3. 避免同一次 render 重複 fetch
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-
-    const currentName = profile?.name || "guest";
-
-    console.log(`🔑 [前端發送] 帳號【${currentName}】，首次產生排程...`);
-
-    fetch("http://localhost:5000/api/generate-plan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: profile?.id,
-        name: currentName,
-        profile,
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("AI 動態排程刷新失敗，請檢查後端連線。");
-        }
-
-        return res.json();
-      })
-      .then(() => fetch("http://localhost:5000/api/tasks"))
-      .then((resTasks) => {
-        if (!resTasks.ok) {
-          throw new Error("無法從 /api/tasks 取得排程清單");
-        }
-
-        return resTasks.json();
-      })
-      .then((tasksData) => {
-        const finalPlan = tasksData.weeklyPlan || tasksData.data || tasksData || [];
-
-        const standardizedPlan = finalPlan.slice(0, 7).map((plan, index) => ({
-          ...plan,
-          day: `Day ${index + 1}`,
-        }));
-
-        setLocalPlan(standardizedPlan);
-        setLoading(false);
-
-        // 4. 新產生的排程存到 App state
-        if (onPlanLoaded) {
-          onPlanLoaded(standardizedPlan);
-        }
-
-        // 5. 新產生的排程也存到 localStorage
-        localStorage.setItem(storageKey, JSON.stringify(standardizedPlan));
-      })
-      .catch((err) => {
-        console.error("💥 排程頁面串接發生錯誤:", err);
-        setError(err.message);
-        setLoading(false);
-      });
-  }, [profile?.id, profile?.name, weeklyPlan, onPlanLoaded]);
-
-  const getCalculatedDate = (dayString) => {
-    const dayNum = parseInt(dayString.replace("Day ", ""), 10);
-    if (isNaN(dayNum)) return "";
     const today = new Date();
     const targetDate = new Date(today);
     targetDate.setDate(today.getDate() + (dayNum - 1));
-    return `${targetDate.getMonth() + 1}/${targetDate.getDate()}`;
-  };
 
-  const currentDayData = localPlan.find(plan => plan.day === selectedDay);
+    return `${targetDate.getMonth() + 1}/${targetDate.getDate()}`;
+  }
+
+  async function loadPlan({ forceRefresh = false } = {}) {
+    if (!profile?.id && !profile?.name) {
+      setError("找不到使用者資料，請先建立學習檔案。");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      if (!forceRefresh && weeklyPlan && weeklyPlan.length > 0) {
+        setLocalPlan(weeklyPlan);
+        localStorage.setItem(storageKey, JSON.stringify(weeklyPlan));
+        setLoading(false);
+        return;
+      }
+
+      if (!forceRefresh) {
+        const savedPlan = localStorage.getItem(storageKey);
+
+        if (savedPlan) {
+          const parsedPlan = JSON.parse(savedPlan);
+
+          if (Array.isArray(parsedPlan) && parsedPlan.length > 0) {
+            setLocalPlan(parsedPlan);
+            onPlanLoaded?.(parsedPlan);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
+      await generatePlan(profile);
+
+      const tasksResult = await getTasks();
+
+      const finalPlan =
+        tasksResult.weeklyPlan ||
+        tasksResult.data ||
+        tasksResult.tasks ||
+        [];
+
+      const standardizedPlan = Array.isArray(finalPlan)
+        ? finalPlan.slice(0, 7).map((plan, index) => ({
+            ...plan,
+            day: plan.day || `Day ${index + 1}`,
+            tasks: Array.isArray(plan.tasks) ? plan.tasks : [],
+          }))
+        : [];
+
+      setLocalPlan(standardizedPlan);
+      onPlanLoaded?.(standardizedPlan);
+      localStorage.setItem(storageKey, JSON.stringify(standardizedPlan));
+
+      const dayOneTasks = standardizedPlan[0]?.tasks || [];
+      if (profile?.id && dayOneTasks.length > 0) {
+        await replaceProgressTasks(profile.id, dayOneTasks);
+      }
+    } catch (err) {
+      console.error("排程頁面串接發生錯誤:", err);
+      setError(err.message || "AI 動態排程刷新失敗，請檢查後端連線。");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    loadPlan();
+  }, [profile?.id, profile?.name]);
+
+  const currentDayData = localPlan.find((plan) => plan.day === selectedDay);
+  const currentTasks = currentDayData?.tasks || [];
   const isToday = selectedDay === "Day 1";
 
-  if (loading) return (
-    <div style={{ padding: '20px' }}>
-      <button className="back-button" onClick={() => goToPage("hub")}>返回主介面</button>
-      <div style={{ color: '#fff', fontSize: '18px', fontWeight: 'bold', marginTop: '20px' }}>
-        🔄 AI為您排程中....
-      </div>
-    </div>
-  );
+  if (loading) {
+    return (
+      <section className="screen">
+        <button className="back-button" onClick={() => goToPage("hub")}>
+          返回主介面
+        </button>
+        <p className="section-label">AI Learning Plan</p>
+        <h2 className="screen-title">AI 為您排程中...</h2>
+      </section>
+    );
+  }
 
-  if (error) return (
-    <div style={{ padding: '20px' }}>
-      <button className="back-button" onClick={() => goToPage("hub")}>返回主介面</button>
-      <div style={{ color: '#ff4d4f', marginTop: '20px' }}>❌ 錯誤: {error}</div>
-    </div>
-  );
+  if (error) {
+    return (
+      <section className="screen">
+        <button className="back-button" onClick={() => goToPage("hub")}>
+          返回主介面
+        </button>
+        <p className="section-label">AI Learning Plan</p>
+        <h2 className="screen-title">AI 學習排程</h2>
+        <p className="section-description" style={{ color: "var(--color-warning, #e57373)" }}>
+          ❌ 錯誤：{error}
+        </p>
+        <button className="primary-button" onClick={() => loadPlan({ forceRefresh: true })}>
+          重新產生計畫
+        </button>
+      </section>
+    );
+  }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', color: '#ffffff' }}>
-      <button className="back-button" onClick={() => goToPage("hub")}>返回主介面</button>
+    <section className="screen">
+      <button className="back-button" onClick={() => goToPage("hub")}>
+        返回主介面
+      </button>
 
-      <h2 className = "screen-title"style={{ marginTop: '16px' }}>📅 你的 AI 智慧排程計畫</h2>
-      <p style={{ color: '#aaa' }}>根據你的目標，AI 已為你量身打造以下計畫：</p>
+      <p className="section-label">AI Learning Plan</p>
+      <h2 className="screen-title">你的 AI 智慧排程計畫</h2>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '10px' }}>
+      <p className="section-description">
+        根據你的目標，AI 已為你量身打造以下 7 天計畫。
+      </p>
+
+      <div className="summary-card">
+        <span>排程依據</span>
+        <h3>{profile?.examGoal || "尚未設定目標"}</h3>
+        <p>考試日期：{profile?.examDate || "未提供考試日期"}</p>
+        <p>
+          每天可讀時間：
+          {profile?.dailyStudyHours
+            ? `${profile.dailyStudyHours} 小時`
+            : "未提供可讀時間"}
+        </p>
+        <p>加強科目：{profile?.weakSubjects || "未提供加強科目"}</p>
+      </div>
+
+      <button
+        className="secondary-button"
+        onClick={() => loadPlan({ forceRefresh: true })}
+      >
+        重新產生計畫
+      </button>
+
+      <div className="day-tabs">
         {localPlan.map((plan) => (
           <button
             key={plan.day}
+            className={`day-tab ${selectedDay === plan.day ? "active" : ""}`}
             onClick={() => setSelectedDay(plan.day)}
-            style={{
-              padding: '10px 18px',
-              borderRadius: '20px',
-              border: '1px solid #007bff',
-              backgroundColor: selectedDay === plan.day ? '#007bff' : 'transparent',
-              color: '#ffffff',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              minWidth: '75px'
-            }}
           >
-            <span style={{ fontWeight: 'bold' }}>{plan.day}</span>
-            <span style={{ fontSize: '12px', opacity: 0.8, marginTop: '2px' }}>
-              {getCalculatedDate(plan.day)}
-            </span>
+            <span>{plan.day}</span>
+            <small>{getCalculatedDate(plan.day)}</small>
           </button>
         ))}
       </div>
 
-      <div style={{ borderTop: '2px solid #007bff', paddingTop: '15px' }}>
-        <h3 style={{ color: '#ffffff', marginBottom: '20px' }}>
+      <div className="section-block">
+        <h3>
           ✨ {selectedDay} 任務清單
-          {isToday && (
-            <span style={{ fontSize: '13px', color: '#aaa', marginLeft: '8px' }}>
-              （今日任務可點擊勾選）
-            </span>
-          )}
+          {isToday && <span className="section-description">（今日任務可點擊勾選）</span>}
         </h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
-          {currentDayData?.tasks?.length > 0 ? (
-            currentDayData.tasks.map((task, index) => (
+        {currentTasks.length > 0 ? (
+          <div className="task-list">
+            {currentTasks.map((task, index) => (
               <TaskCard
-                key={task.id || `task-${index}`}
-                title={task.title || '未命名任務'}
-                isCompleted={checkedTasks?.includes(String(task.id)) || false}
-                onToggle={isToday && toggleTask ? () => toggleTask(task.id) : undefined}
+                key={task.id || `${selectedDay}-${index}`}
+                title={task.title || task.name || "未命名任務"}
+                description={task.description || task.detail || ""}
+                time={task.time || ""}
+                duration={task.duration || ""}
+                isCompleted={
+                  checkedTasks.includes(task.id) ||
+                  checkedTasks.includes(index) ||
+                  task.isCompleted ||
+                  task.completed ||
+                  false
+                }
+                onToggle={isToday ? () => toggleTask(task.id || index) : undefined}
               />
-            ))
-          ) : (
-            <p style={{ color: '#aaa' }}>今天沒有安排任務，放鬆一下吧！</p>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="section-description">這一天沒有安排任務，放鬆一下吧！</p>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
 

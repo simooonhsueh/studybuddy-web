@@ -279,3 +279,87 @@ export async function updateUserProfile(id, profile) {
 
   return result;
 }
+
+export async function generatePlan(profile) {
+  const response = await fetch(`${API_BASE_URL}/generate-plan`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: profile.id,
+      name: profile.name,
+      examGoal: profile.examGoal,
+      examDate: profile.examDate,
+      dailyStudyHours: profile.dailyStudyHours,
+      preferredSubjects: profile.preferredSubjects,
+      weakSubjects: profile.weakSubjects,
+      availableStartTime: profile.availableStartTime,
+      availableEndTime: profile.availableEndTime,
+      wakeTime: profile.wakeTime,
+      sleepTime: profile.sleepTime,
+      profile,
+    }),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to generate plan");
+  }
+
+  return result;
+}
+
+export async function getTasks() {
+  const response = await fetch(`${API_BASE_URL}/tasks`);
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to get tasks");
+  }
+
+  return result;
+}
+
+
+export async function replaceProgressTasks(userId, tasks) {
+  const response = await fetch(`${API_BASE_URL}/progress/tasks`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "x-user-id": String(userId),
+    },
+    body: JSON.stringify({ tasks }),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to replace progress tasks");
+  }
+
+  return result;
+}
+
+export async function completeProgressTask(userId, taskId, isCompleted) {
+  const response = await fetch(
+    `${API_BASE_URL}/progress/tasks/${taskId}/complete`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-id": String(userId),
+      },
+      body: JSON.stringify({ isCompleted }),
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to complete progress task");
+  }
+
+  return result;
+}

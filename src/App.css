@@ -827,3 +827,34 @@ textarea:focus {
 .group-progress-item p {
   margin: 4px 0;
 }
+
+.day-tabs {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin: 24px 0;
+  padding-bottom: 8px;
+}
+
+.day-tab {
+  min-width: 82px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border, #2f3548);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.day-tab.active {
+  background: var(--color-primary, #4f6df5);
+  border-color: var(--color-primary, #4f6df5);
+}
+
+.day-tab small {
+  opacity: 0.75;
+}
